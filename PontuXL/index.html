@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>PontuXL — Jeu</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* --- Styles pour le plateau de jeu --- */
+
+    #game-section {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+      width: 100%;
+    }
+    #info-bar {
+      color: white;
+      font-size: 18px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #info-bar span {
+      font-weight: bold;
+      padding: 4px 12px;
+      border-radius: 6px;
+    }
+
+    #board-canvas {
+      border: 2px solid #555;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #f5f0e1;
+    }
+
+    #message-box {
+      color: #ccc;
+      font-size: 16px;
+      margin-top: 15px;
+      text-align: center;
+      min-height: 24px;
+    }
+
+    #direction-buttons {
+      margin-top: 15px;
+      display: none;
+    }
+
+    #direction-buttons button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #555;
+      color: white;
+    }
+
+    #direction-buttons button:hover {
+      background-color: #888;
+    }
+
+    #bridge-actions {
+      margin-top: 15px;
+      display: none;
+    }
+
+    #bridge-actions button {
+      padding: 10px 20px;
+      margin: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      border: none;
+      border-radius: 6px;
+      background-color: #c0392b;
+      color: white;
+    }
+
+    #bridge-actions button:hover {
+      background-color: #e74c3c;
+    }
+  </style>
+</head>
+<body>
+<section>
+  <h1>PontuXL</h1>
+  <p>Jeu à 4 joueurs — version terrain glissant</p>
+
+  <div id="game-section">
+    <!-- Barre d'info : qui joue, quelle phase -->
+    <div id="info-bar">
+      Tour : <span id="current-player">Vert</span>
+      — Phase : <span id="current-phase">Placement</span>
+    </div>
+
+    <!-- Le plateau de jeu -->
+    <canvas id="board-canvas" width="500" height="500"></canvas>
+
+    <!-- Message pour guider le joueur -->
+    <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
+
+    <!-- Boutons de direction (phase mouvement) -->
+    <div id="direction-buttons">
+      <button onclick="chooseDirection('up')">↑ Haut</button>
+      <button onclick="chooseDirection('down')">↓ Bas</button>
+      <button onclick="chooseDirection('left')">← Gauche</button>
+      <button onclick="chooseDirection('right')">→ Droite</button>
+      <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
+    </div>
+
+    <!-- Boutons pour gérer les ponts traversés -->
+    <div id="bridge-actions">
+      <p id="bridge-action-label" style="color:#ccc;"></p>
+      <button onclick="bridgeAction('remove')">Retirer le pont</button>
+      <button onclick="bridgeAction('rotate')">Tourner le pont</button>
+    </div>
+  </div>
+</section>
+
+<!-- Scripts : game.js d'abord, puis board.js -->
+<script src="./game.js"></script>
+<script src="./board.js"></script>
+
+<!-- Scripts du bot (garder pour plus tard) -->
+<script src="./tau-prolog.js"></script>
+<script src="./chat_bot.js"></script>
+<script src="./prolog_session.js"></script>
+<script src="./main.js"></script>
+</body>
+</html>
