@@ -1,4 +1,3 @@
-
 //  état et logique du jeu
 
 // constantes du jeu
@@ -255,35 +254,54 @@ function moveLutin(lutinIndex, direction) {
 //  gestion des ponts après déplacement
 
 // pour chaque pont traversé, le joueur choisit : retirer ou tourner
-// action = "remove" ou "rotate"
+// actions possibles :
+// "remove"
+// "rotate1_left"  : axe case 1, pont vertical → gauche / pont horizontal → bas
+// "rotate1_right" : axe case 1, pont vertical → droite / pont horizontal → haut
+// "rotate2_left"  : axe case 2, pont vertical → gauche / pont horizontal → bas
+// "rotate2_right" : axe case 2, pont vertical → droite / pont horizontal → haut
 function handleBridgeAction(x1, y1, x2, y2, action) {
     if (action === "remove") {
         removeBridge(x1, y1, x2, y2);
-    } else if (action === "rotate") {
-        // tourner = retirer le pont actuel et en créer un perpendiculaire
-        // le pont tourne autour de la case de départ (x1, y1)
-        removeBridge(x1, y1, x2, y2);
-
-        // calculer la direction du pont actuel
-        let dx = x2 - x1;
-        let dy = y2 - y1;
-
-        // rotation 90° : (dx, dy) -> (-dy, dx)
-        let newDx = -dy;
-        let newDy = dx;
-        let newX2 = x1 + newDx;
-        let newY2 = x1 + newDy; // bug volontaire ? non : c'est y1
-        // correction :
-        newX2 = x1 + newDx;
-        newY2 = y1 + newDy;
-
-        // vérifier que la nouvelle position est dans le plateau
-        if (newX2 >= 0 && newX2 < BOARD_SIZE && newY2 >= 0 && newY2 < BOARD_SIZE) {
-            let key = bridgeKey(x1, y1, newX2, newY2);
-            bridges.add(key);
-        }
-        // sinon le pont disparaît simplement
+        return;
     }
+
+    if (!action.startsWith("rotate")) return;
+
+    // Déterminer l'axe
+    let ax, ay, bx, by;
+    if (action.startsWith("rotate1")) {
+        ax = x1; ay = y1; bx = x2; by = y2;
+    } else {
+        ax = x2; ay = y2; bx = x1; by = y1;
+    }
+
+    let isVertical = (x1 === x2); // même x = pont vertical
+    let goRight = action.endsWith("right");
+
+    // Pont vertical (↑) : tourne vers gauche (-1,0) ou droite (+1,0)
+    // Pont horizontal (→) : tourne vers haut (0,+1) ou bas (0,-1)
+    let newDx, newDy;
+    if (isVertical) {
+        newDx = goRight ? 1 : -1;
+        newDy = 0;
+    } else {
+        newDx = 0;
+        newDy = goRight ? 1 : -1;
+    }
+
+    let newX2 = ax + newDx;
+    let newY2 = ay + newDy;
+
+    removeBridge(x1, y1, x2, y2);
+
+    if (newX2 >= 0 && newX2 < BOARD_SIZE && newY2 >= 0 && newY2 < BOARD_SIZE) {
+        let newKey = bridgeKey(ax, ay, newX2, newY2);
+        if (!bridges.has(newKey)) {
+            bridges.add(newKey);
+        }
+    }
+    // sinon le pont disparaît simplement
 }
 
 
@@ -340,6 +358,18 @@ function playersRemaining() {
 // vérifie si le jeu est terminé
 function isGameOver() {
     return playersRemaining() <= 1;
+}
+
+// retourne la liste de tous les ponts existants sous forme [[x1,y1,x2,y2], ...]
+function getAllBridges() {
+    let result = [];
+    for (let key of bridges) {
+        let parts = key.split("-");
+        let c1 = parts[0].split(",");
+        let c2 = parts[1].split(",");
+        result.push([parseInt(c1[0]), parseInt(c1[1]), parseInt(c2[0]), parseInt(c2[1])]);
+    }
+    return result;
 }
 
 // retourne le gagnant

@@ -5,8 +5,6 @@
   <title>PontuXL — Jeu</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* --- Styles pour le plateau de jeu --- */
-
     #game-section {
       display: flex;
       flex-direction: column;
@@ -20,20 +18,17 @@
       margin-bottom: 10px;
       text-align: center;
     }
-
     #info-bar span {
       font-weight: bold;
       padding: 4px 12px;
       border-radius: 6px;
     }
-
     #board-canvas {
       border: 2px solid #555;
       border-radius: 8px;
       cursor: pointer;
       background-color: #f5f0e1;
     }
-
     #message-box {
       color: #ccc;
       font-size: 16px;
@@ -41,12 +36,10 @@
       text-align: center;
       min-height: 24px;
     }
-
     #direction-buttons {
       margin-top: 15px;
       display: none;
     }
-
     #direction-buttons button {
       padding: 10px 20px;
       margin: 5px;
@@ -57,16 +50,11 @@
       background-color: #555;
       color: white;
     }
-
-    #direction-buttons button:hover {
-      background-color: #888;
-    }
-
+    #direction-buttons button:hover { background-color: #888; }
     #bridge-actions {
       margin-top: 15px;
       display: none;
     }
-
     #bridge-actions button {
       padding: 10px 20px;
       margin: 5px;
@@ -77,10 +65,74 @@
       background-color: #c0392b;
       color: white;
     }
+    #bridge-actions button:hover { background-color: #e74c3c; }
 
-    #bridge-actions button:hover {
-      background-color: #e74c3c;
+    /* --- Bot chat --- */
+    #bot-section {
+      width: 90%;
+      max-width: 500px;
+      margin: 30px auto 0 auto;
+      background-color: #2d2d2d;
+      border-radius: 10px;
+      padding: 15px;
     }
+    #bot-section h2 {
+      color: rgba(255,255,255,0.7);
+      font-size: 18px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    #bot-texts {
+      height: 200px;
+      overflow-y: auto;
+      margin-bottom: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    #bot-texts p {
+      margin: 0;
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      width: fit-content;
+      max-width: 90%;
+    }
+    #bot-texts p.user-msg {
+      background-color: #3a3a5c;
+      color: #ccc;
+      align-self: flex-end;
+      text-align: right;
+    }
+    #bot-texts p.bot-msg {
+      background-color: #1a4a2a;
+      color: #aee;
+      align-self: flex-start;
+    }
+    #bot-input-row {
+      display: flex;
+      gap: 8px;
+    }
+    #bot-input {
+      flex: 1;
+      padding: 8px 12px;
+      border-radius: 6px;
+      border: none;
+      font-size: 14px;
+      background-color: #444;
+      color: white;
+    }
+    #bot-input::placeholder { color: #999; }
+    #bot-send {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      background-color: #27ae60;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #bot-send:hover { background-color: #2ecc71; }
   </style>
 </head>
 <body>
@@ -89,19 +141,15 @@
   <p>Jeu à 4 joueurs — version terrain glissant</p>
 
   <div id="game-section">
-    <!-- Barre d'info : qui joue, quelle phase -->
     <div id="info-bar">
       Tour : <span id="current-player">Vert</span>
       — Phase : <span id="current-phase">Placement</span>
     </div>
 
-    <!-- Le plateau de jeu -->
     <canvas id="board-canvas" width="500" height="500"></canvas>
 
-    <!-- Message pour guider le joueur -->
     <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
 
-    <!-- Boutons de direction (phase mouvement) -->
     <div id="direction-buttons">
       <button onclick="chooseDirection('up')">↑ Haut</button>
       <button onclick="chooseDirection('down')">↓ Bas</button>
@@ -110,20 +158,32 @@
       <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
     </div>
 
-    <!-- Boutons pour gérer les ponts traversés -->
-    <div id="bridge-actions">
-      <p id="bridge-action-label" style="color:#ccc;"></p>
-      <button onclick="bridgeAction('remove')">Retirer le pont</button>
-      <button onclick="bridgeAction('rotate')">Tourner le pont</button>
+    <div id="bridge-pick-actions" style="display:none; margin-top:15px; text-align:center;">
+      <p id="bridge-pick-label" style="color:#ccc; margin-bottom:8px; font-size:14px;"></p>
+      <button id="btn-pick-remove" onclick="applyBridgePick('remove')" style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#c0392b; color:white;">🗑️ Supprimer</button>
+      <button id="btn-pick-rotate1-ccw" onclick="applyBridgePick('rotate1_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↺ Axe 1 gauche</button>
+      <button id="btn-pick-rotate1-cw"  onclick="applyBridgePick('rotate1_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↻ Axe 1 droite</button>
+      <button id="btn-pick-rotate2-ccw" onclick="applyBridgePick('rotate2_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↺ Axe 2 gauche</button>
+      <button id="btn-pick-rotate2-cw"  onclick="applyBridgePick('rotate2_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↻ Axe 2 droite</button>
     </div>
   </div>
+
+  <!-- Bot textuel -->
+  <div id="bot-section">
+    <h2>🤖 PBot — Assistant PontuXL</h2>
+    <div id="bot-texts">
+      <p class="bot-msg">PBot : Bonjour ! Je suis PBot, le bot explicateur du jeu PontuXL. En quoi puis-je vous aider ?</p>
+    </div>
+    <div id="bot-input-row">
+      <input id="bot-input" type="text" placeholder="Posez votre question ici..." />
+      <button id="bot-send" onclick="sendMessage()">Envoyer</button>
+    </div>
+  </div>
+
 </section>
 
-<!-- Scripts : game.js d'abord, puis board.js -->
 <script src="./game.js"></script>
 <script src="./board.js"></script>
-
-<!-- Scripts du bot (garder pour plus tard) -->
 <script src="./tau-prolog.js"></script>
 <script src="./chat_bot.js"></script>
 <script src="./prolog_session.js"></script>

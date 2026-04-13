@@ -1,36 +1,13 @@
-/* From https://www.youtube.com/watch?v=-k-PgvbktX4
-   and https://codepen.io/Web_Cifar/pen/jOqBEjE
-*/
-
-
-function annonceOut() {
-
-    document.getElementById("annonce").style.display = "none";
-
-    const mess_annonce = "Bienvenue ! Je suis le bot de PontuXL. Puis-je vous aider ?";
-    p = document.createElement("p");
-    p.classList.add("replay");
-    p.innerText = mess_annonce;
-    texts.appendChild(p);
-    p = document.createElement("p");
-    speech.text = mess_annonce;
-    window.speechSynthesis.speak(speech);
-    
-} 
-
-
-
-function toArray (str) {
-  const array = []
+function toArray(str) {
+  const array = [];
   for (let i = 0; i < str.length; ++i) {
-    array.push(str.charCodeAt(i))
+    array.push(str.charCodeAt(i));
   }
-
-  array.push(10) // newline character
-  return array
+  array.push(10); // newline
+  return array;
 }
 
-function fromArrayCodeToString (arr) {
+function fromArrayCodeToString(arr) {
   var res = [];
   for (var i = 0; i < arr.length; i++) {
     res.push(String.fromCharCode(arr[i]));
@@ -38,76 +15,58 @@ function fromArrayCodeToString (arr) {
   return res.join("");
 }
 
-function jmjCodeToString (parr) {
-   if (parr.args.length == 0) { return [] }
-   else { 
-     const arr = jmjCodeToString(parr.args[1])
-     arr.unshift(parr.args[0].value)
-     return arr
-   }
+function jmjCodeToString(parr) {
+  if (parr.args.length == 0) { return []; }
+  else {
+    const arr = jmjCodeToString(parr.args[1]);
+    arr.unshift(parr.args[0].value);
+    return arr;
+  }
 }
 
-const texts = document.querySelector(".texts");
-
-window.SpeechRecognition =
-  window.SpeechRecognition || window.webkitSpeechRecognition;
-
-const recognition = new SpeechRecognition();
-recognition.interimResults = true;
-recognition.lang = 'fr-FR';
-
-const speech = new SpeechSynthesisUtterance();
-speech.lang = "fr-FR";
-speech.volume = 1;
-speech.rate = 1;
-speech.pitch = 1;
-
 const plSession = new PrologSession();
-var question = '';
-var response = '';
-var realresponse = '';
 
-var msg;
+function sendMessage() {
+  const input = document.getElementById("bot-input");
+  const texts = document.getElementById("bot-texts");
+  const text = input.value.trim();
+  if (!text) return;
 
-let p = document.createElement("p");
+  // Afficher la question de l'utilisateur
+  const pUser = document.createElement("p");
+  pUser.classList.add("user-msg");
+  pUser.innerText = "Vous : " + text;
+  texts.appendChild(pUser);
 
-recognition.addEventListener("result", (e) => {
+  // Envoyer à Prolog
+  const question = toArray(text.toLowerCase());
+  plSession.query(`
+    lire_question([${question}], L_Mots),
+    produire_reponse(L_Mots, L_reponse),
+    transformer_reponse_en_string(L_reponse, Message).
+  `);
 
-  texts.appendChild(p);
-  const text = Array.from(e.results)
-    .map((result) => result[0])
-    .map((result) => result.transcript)
-    .join("");
+  const response = plSession.get_response();
+  const realResponse = fromArrayCodeToString(jmjCodeToString(response));
 
-  p.innerText = text;
-  console.log(text)
-    if (e.results[0].isFinal) {
-      console.log("text prefix")
-      console.log(text.slice(0,20))
-	if (text.slice(0,15).includes("bot") || text.slice(0,20).includes("pontu")) {
-      question = toArray(text.toLowerCase());
-      plSession.query(`
-                    lire_question([${question}], L_Mots), 
-                    produire_reponse(L_Mots,L_reponse),
-                    transformer_reponse_en_string(L_reponse,Message).
-		 `);
-      response = plSession.get_response();
-      console.log("final response")
-      real_response = fromArrayCodeToString(jmjCodeToString(response))
-      console.log(real_response)
-      p = document.createElement("p");
-      p.classList.add("replay");
-      p.innerText = real_response;
-      texts.appendChild(p);
-      p = document.createElement("p");
-      speech.text = real_response;
-      window.speechSynthesis.speak(speech);
-    }}
+  // Afficher la réponse du bot
+  const pBot = document.createElement("p");
+  pBot.classList.add("bot-msg");
+  pBot.innerText = "PBot : " + (realResponse || "Je ne sais pas.");
+  texts.appendChild(pBot);
 
+  // Scroll vers le bas
+  texts.scrollTop = texts.scrollHeight;
+
+  input.value = "";
+}
+
+// Envoyer avec la touche Entrée
+document.addEventListener("DOMContentLoaded", () => {
+  const input = document.getElementById("bot-input");
+  if (input) {
+    input.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") sendMessage();
+    });
+  }
 });
-
-recognition.addEventListener("end", () => {
-  recognition.start();
-});
-
-recognition.start();
