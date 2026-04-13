@@ -66,7 +66,7 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 % ----------------------------------------------------------------%
 
-nb_lutins(4).
+nb_lutins(6).
 nb_equipes(4).
 
 mclef(commence,10).
