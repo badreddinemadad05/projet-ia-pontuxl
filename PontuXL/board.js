@@ -527,12 +527,11 @@ function handleAIMove() {
             let result = moveLutin(i, dir);
             if (result !== null) {
                 // IA retire un pont traversé au hasard
-                for (let bridge of result) {
-                    if (bridgeExists(bridge[0], bridge[1], bridge[2], bridge[3])) {
-                        removeBridge(bridge[0], bridge[1], bridge[2], bridge[3]);
-                        break;
-                    }
-                }
+               for (let bridge of result) {
+                   if (bridgeExists(bridge[0], bridge[1], bridge[2], bridge[3])) {
+                       removeBridge(bridge[0], bridge[1], bridge[2], bridge[3]);
+                            }
+                   }    
                 drawBoard(); finishTurn(); return;
             }
         }
