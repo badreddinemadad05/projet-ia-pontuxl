@@ -93,7 +93,7 @@ regle_rep(quipe,5,
        nb_lutins(X),
        write_to_chars(X,X_in_chars).
 
-write_to_chars(4,"4 ").
+write_to_chars(6,"6 ").
 
 
 
