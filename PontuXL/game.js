@@ -86,11 +86,12 @@ function currentPlayer() {
 
 // passe au joueur suivant (en sautant les éliminés)
 function nextPlayer() {
+    let attempts = 0;
     do {
         currentPlayerIndex = (currentPlayerIndex + 1) % 4;
-    } while (eliminated[currentPlayer()]);
+        attempts++;
+    } while (eliminated[currentPlayer()] && attempts < 4);
 }
-
 // vérifie si une case est occupée par un lutin
 function isOccupied(x, y) {
     for (let color of COLORS) {
