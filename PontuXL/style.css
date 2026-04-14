@@ -53,3 +53,17 @@ section p {
 .texts p.replay {
   text-align: right;
 }
+
+#bot-voice, #bot-read {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 6px;
+  background-color: #555;
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#bot-voice:hover, #bot-read:hover {
+  background-color: #777;
+}
