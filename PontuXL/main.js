@@ -39,7 +39,13 @@ function sendMessage() {
   texts.appendChild(pUser);
 
   // Envoyer à Prolog
-  const question = toArray(text.toLowerCase());
+  const normalizedText = text
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")   // enlève les accents
+    .replace(/['’\-]/g, " ");          // remplace apostrophes et tirets par des espaces
+
+  const question = toArray(normalizedText);
   plSession.query(`
     lire_question([${question}], L_Mots),
     produire_reponse(L_Mots, L_reponse),
