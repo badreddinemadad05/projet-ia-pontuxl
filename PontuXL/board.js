@@ -510,36 +510,78 @@ function startPlayerTurn() {
 // IA TEMPORAIRE
 // ============================================================
 
-function handleAIMove() {
-    let player = currentPlayer();
-    if (!canPlayerMove(player)) {
-        let allB = getAllBridges();
-        if (allB.length > 0) {
-            let b = allB[Math.floor(Math.random() * allB.length)];
-            removeBridge(b[0], b[1], b[2], b[3]);
-        }
-        drawBoard(); finishTurn(); return;
-    }
-    for (let i = 0; i < lutins[player].length; i++) {
-        let dirs = ["up", "down", "left", "right"];
-        dirs.sort(() => Math.random() - 0.5);
-        for (let dir of dirs) {
-            let result = moveLutin(i, dir);
-            if (result !== null) {
-                // IA retire un pont traversé au hasard
-               for (let bridge of result) {
-                   if (bridgeExists(bridge[0], bridge[1], bridge[2], bridge[3])) {
-                       removeBridge(bridge[0], bridge[1], bridge[2], bridge[3]);
-                            }
-                   }    
-                drawBoard(); finishTurn(); return;
-            }
+function buildPrologState() {
+    let state = currentPlayer() + "|";
+
+    for (let color of COLORS) {
+        for (let pos of lutins[color]) {
+            state += `${color}:${pos[0]}:${pos[1]},`;
         }
     }
-    drawBoard(); finishTurn();
+
+    state += "|";
+
+    for (let b of getAllBridges()) {
+        state += `${b[0]}:${b[1]}:${b[2]}:${b[3]},`;
+    }
+
+    return state;
 }
 
+function handleAIMove() {
+    let player = currentPlayer();
 
+    let gameState = "test"; // pour l'instant
+
+    let question = toArray(gameState);
+
+    plSession.reset_response();
+
+
+    plSession.query(`
+    decide_move(_, Move),
+    transformer_reponse_en_string([Move], Message).
+    `);
+
+    setTimeout(() => {
+        let response = plSession.get_response();
+
+        console.log("Réponse brute :", response);
+
+        if (!response) {
+            console.log("Pas de réponse !");
+            finishTurn();
+            return;
+        }
+
+        let decoded = fromArrayCodeToString(jmjCodeToString(response)).trim();
+
+        console.log("Décodé :", decoded);
+
+        let parts = decoded.split(",");
+        let lutinIndex = parseInt(parts[0]);
+        let direction = parts[1];
+        let action = parts[2];
+
+        console.log("Tentative move :", lutinIndex, direction);
+
+        let bridges = moveLutin(lutinIndex, direction);
+
+        if (bridges === null) {
+            console.log("Move impossible !");
+            finishTurn();
+            return;
+        }
+
+        for (let b of bridges) {
+            handleBridgeAction(b[0], b[1], b[2], b[3], action);
+        }
+
+        drawBoard();
+        finishTurn();
+
+    }, 100);
+}
 // ============================================================
 // UI
 // ============================================================
@@ -563,3 +605,10 @@ initGame();
 drawBoard();
 updateInfoBar();
 setMessage("Cliquez sur une case pour placer un lutin vert.");
+
+fetch("ai_bot.pl")
+  .then(res => res.text())
+  .then(program => {
+      plSession.session.consult(program);
+      console.log("Prolog chargé !");
+  });

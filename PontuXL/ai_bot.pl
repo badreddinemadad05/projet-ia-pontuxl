@@ -1,0 +1,27 @@
+decide_move(_, Move) :-
+    member(Move, [
+        "0,up,remove",
+        "0,down,remove",
+        "0,left,remove",
+        "0,right,remove",
+        "1,up,remove",
+        "1,down,remove",
+        "1,left,remove",
+        "1,right,remove",
+        "2,up,remove",
+        "2,down,remove",
+        "2,left,remove",
+        "2,right,remove",
+        "3,up,remove",
+        "3,down,remove",
+        "3,left,remove",
+        "3,right,remove",
+        "4,up,remove",
+        "4,down,remove",
+        "4,left,remove",
+        "4,right,remove",
+        "5,up,remove",
+        "5,down,remove",
+        "5,left,remove",
+        "5,right,remove"
+    ]).
