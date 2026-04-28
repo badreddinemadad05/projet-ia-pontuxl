@@ -4,7 +4,13 @@
   <meta charset="UTF-8">
   <title>PontuXL — Jeu</title>
   <link rel="stylesheet" href="style.css">
+
+  <!-- ======================================================
+       STYLES SPECIFIQUES A CETTE PAGE
+       (les styles globaux sont dans style.css)
+       ====================================================== -->
   <style>
+    /* --- Zone de jeu principale (plateau + boutons) --- */
     #game-section {
       display: flex;
       flex-direction: column;
@@ -12,6 +18,8 @@
       padding: 20px;
       width: 100%;
     }
+
+    /* Barre d'information : joueur courant et phase de jeu */
     #info-bar {
       color: white;
       font-size: 18px;
@@ -22,13 +30,18 @@
       font-weight: bold;
       padding: 4px 12px;
       border-radius: 6px;
+      /* La couleur de fond est changee dynamiquement par board.js */
     }
+
+    /* Le canvas ou le plateau est dessine par board.js */
     #board-canvas {
       border: 2px solid #555;
       border-radius: 8px;
       cursor: pointer;
       background-color: #f5f0e1;
     }
+
+    /* Zone de message sous le plateau (instructions pour le joueur) */
     #message-box {
       color: #ccc;
       font-size: 16px;
@@ -36,6 +49,9 @@
       text-align: center;
       min-height: 24px;
     }
+
+    /* Boutons de direction (haut/bas/gauche/droite/annuler)
+       Caches par defaut, affiches quand un lutin est selectionne */
     #direction-buttons {
       margin-top: 15px;
       display: none;
@@ -51,6 +67,9 @@
       color: white;
     }
     #direction-buttons button:hover { background-color: #888; }
+
+    /* Boutons d'action sur les ponts (non utilises actuellement,
+       les actions se font via les fleches vertes sur le canvas) */
     #bridge-actions {
       margin-top: 15px;
       display: none;
@@ -67,7 +86,7 @@
     }
     #bridge-actions button:hover { background-color: #e74c3c; }
 
-    /* --- Bot chat --- */
+    /* --- Bot chat (zone de conversation avec PBot) --- */
     #bot-section {
       width: 90%;
       max-width: 500px;
@@ -82,6 +101,8 @@
       margin-bottom: 10px;
       text-align: center;
     }
+
+    /* Zone de defilement des messages (hauteur fixe avec scrollbar) */
     #bot-texts {
       height: 200px;
       overflow-y: auto;
@@ -98,17 +119,23 @@
       width: fit-content;
       max-width: 90%;
     }
+
+    /* Messages de l'utilisateur : bulle a droite, fond bleu sombre */
     #bot-texts p.user-msg {
       background-color: #3a3a5c;
       color: #ccc;
       align-self: flex-end;
       text-align: right;
     }
+
+    /* Messages du bot : bulle a gauche, fond vert sombre */
     #bot-texts p.bot-msg {
       background-color: #1a4a2a;
       color: #aee;
       align-self: flex-start;
     }
+
+    /* Ligne de saisie du message (champ texte + boutons) */
     #bot-input-row {
       display: flex;
       gap: 8px;
@@ -140,16 +167,28 @@
   <h1>PontuXL</h1>
   <p>Jeu à 4 joueurs — version terrain glissant</p>
 
+  <!-- ======================================================
+       ZONE DE JEU PRINCIPALE
+       Contient le plateau (canvas), la barre d'info,
+       les messages et les panneaux de boutons.
+       ====================================================== -->
   <div id="game-section">
+
+    <!-- Barre d'info : indique le joueur courant (avec sa couleur) et la phase -->
     <div id="info-bar">
       Tour : <span id="current-player">Vert</span>
       — Phase : <span id="current-phase">Placement</span>
     </div>
 
+    <!-- Le plateau de jeu est dessine ici par board.js via l'API Canvas 2D -->
     <canvas id="board-canvas" width="500" height="500"></canvas>
 
+    <!-- Message d'instruction affiche sous le plateau (mis a jour par board.js) -->
     <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
 
+    <!-- Boutons de direction : affiches quand un lutin est selectionne.
+         Caches par defaut (display:none dans le CSS), affiches par board.js.
+         Appellent chooseDirection() avec la direction choisie. -->
     <div id="direction-buttons">
       <button onclick="chooseDirection('up')">↑ Haut</button>
       <button onclick="chooseDirection('down')">↓ Bas</button>
@@ -158,37 +197,70 @@
       <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
     </div>
 
+    <!-- Panneau d'action sur les ponts : affiche apres un deplacement.
+         Le joueur voit le pont concerne et peut choisir de le supprimer.
+         Les rotations se font en cliquant sur les fleches vertes du canvas
+         (les boutons rotate ci-dessous sont caches en permanence et
+         conserves uniquement pour un usage futur eventuel). -->
     <div id="bridge-pick-actions" style="display:none; margin-top:15px; text-align:center;">
+      <!-- Libelle du pont selectionne (ex : "Pont (2,3)–(3,3) horizontal →") -->
       <p id="bridge-pick-label" style="color:#ccc; margin-bottom:8px; font-size:14px;"></p>
+
+      <!-- Bouton principal : supprimer le pont -->
       <button id="btn-pick-remove" onclick="applyBridgePick('remove')" style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#c0392b; color:white;">🗑️ Supprimer</button>
-      <button id="btn-pick-rotate1-ccw" onclick="applyBridgePick('rotate1_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↺ Axe 1 gauche</button>
-      <button id="btn-pick-rotate1-cw"  onclick="applyBridgePick('rotate1_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↻ Axe 1 droite</button>
-      <button id="btn-pick-rotate2-ccw" onclick="applyBridgePick('rotate2_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↺ Axe 2 gauche</button>
-      <button id="btn-pick-rotate2-cw"  onclick="applyBridgePick('rotate2_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↻ Axe 2 droite</button>
+
+      <!-- Boutons de rotation (caches : les rotations passent par les fleches du canvas).
+           Conserves pour coherence avec applyBridgePick() et showBridgePickActions(). -->
+      <button id="btn-pick-rotate1-left"  onclick="applyBridgePick('rotate1_left')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↺ Axe 1 gauche</button>
+      <button id="btn-pick-rotate1-right" onclick="applyBridgePick('rotate1_right')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↻ Axe 1 droite</button>
+      <button id="btn-pick-rotate2-left"  onclick="applyBridgePick('rotate2_left')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↺ Axe 2 gauche</button>
+      <button id="btn-pick-rotate2-right" onclick="applyBridgePick('rotate2_right')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↻ Axe 2 droite</button>
     </div>
   </div>
 
-  <!-- Bot textuel -->
+  <!-- ======================================================
+       CHATBOT TEXTUEL "PBOT"
+       L'utilisateur peut poser des questions sur les regles
+       du jeu. PBot repond grace au moteur Prolog (chat_bot.js).
+       ====================================================== -->
   <div id="bot-section">
     <h2>🤖 PBot — Assistant PontuXL</h2>
+
+    <!-- Zone de defilement des messages echanges avec PBot -->
     <div id="bot-texts">
       <p class="bot-msg">PBot : Bonjour ! Je suis PBot, le bot explicateur du jeu PontuXL. En quoi puis-je vous aider ?</p>
     </div>
+
+    <!-- Ligne de saisie : champ texte + bouton Envoyer + micro + lecture vocale -->
     <div id="bot-input-row">
       <input id="bot-input" type="text" placeholder="Posez votre question ici..." />
       <button id="bot-send" onclick="sendMessage()">Envoyer</button>
+      <!-- Lance la reconnaissance vocale (necessite Chrome ou Edge) -->
       <button id="bot-voice" onclick="startVoiceInput()">🎤 Parler</button>
+      <!-- Lit la derniere reponse du bot a voix haute -->
       <button id="bot-read" onclick="speakLastBotMessage()">🔊 Lire la réponse</button>
     </div>
   </div>
 
 </section>
 
-<script src="./game.js"></script>
-<script src="./board.js"></script>
+<!-- ======================================================
+     CHARGEMENT DES SCRIPTS JAVASCRIPT
+     L'ordre est important : chaque fichier peut utiliser
+     les fonctions et variables des fichiers charges avant lui.
+
+     1. tau-prolog.js    : librairie Prolog (moteur externe)
+     2. chat_bot.js      : les regles du chatbot en Prolog (constante CHATBOT)
+     3. prolog_session.js: la classe PrologSession (utilise CHATBOT et pl de tau-prolog)
+     4. main.js          : cree plSession et gere le chatbot textuel
+     5. game.js          : etat du jeu et logique (lutins, ponts, tours)
+     6. board.js         : affichage et interactions (utilise game.js et plSession)
+     ====================================================== -->
 <script src="./tau-prolog.js"></script>
 <script src="./chat_bot.js"></script>
 <script src="./prolog_session.js"></script>
 <script src="./main.js"></script>
+<script src="./game.js"></script>
+<script src="./board.js"></script>
 </body>
 </html>

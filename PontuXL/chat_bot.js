@@ -12,8 +12,7 @@ const CHATBOT = String.raw`
 /*                                                                       */
 /* --------------------------------------------------------------------- */
 
-produire_reponse([fin],[L1]) :-
-    L1 = [merci, de, m, '\'', avoir, consulte], !.
+produire_reponse([fin], ["Merci de m'avoir consulte."]) :- !.
 
 produire_reponse(L,Rep) :-
     mclef(M,_),
