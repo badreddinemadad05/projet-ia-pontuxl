@@ -5,6 +5,7 @@
   <title>PontuXL — Jeu</title>
   <link rel="stylesheet" href="style.css">
   <style>
+    /* ===== PLATEAU ===== */
     #game-section {
       display: flex;
       flex-direction: column;
@@ -51,26 +52,11 @@
       color: white;
     }
     #direction-buttons button:hover { background-color: #888; }
-    #bridge-actions {
-      margin-top: 15px;
-      display: none;
-    }
-    #bridge-actions button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      background-color: #c0392b;
-      color: white;
-    }
-    #bridge-actions button:hover { background-color: #e74c3c; }
 
-    /* --- Bot chat --- */
+    /* ===== BOT CHAT ===== */
     #bot-section {
       width: 90%;
-      max-width: 500px;
+      max-width: 520px;
       margin: 30px auto 0 auto;
       background-color: #2d2d2d;
       border-radius: 10px;
@@ -83,12 +69,13 @@
       text-align: center;
     }
     #bot-texts {
-      height: 200px;
+      height: 220px;
       overflow-y: auto;
       margin-bottom: 10px;
       display: flex;
       flex-direction: column;
       gap: 6px;
+      padding: 5px;
     }
     #bot-texts p {
       margin: 0;
@@ -97,6 +84,7 @@
       font-size: 14px;
       width: fit-content;
       max-width: 90%;
+      white-space: pre-line;
     }
     #bot-texts p.user-msg {
       background-color: #3a3a5c;
@@ -124,7 +112,7 @@
     }
     #bot-input::placeholder { color: #999; }
     #bot-send {
-      padding: 8px 16px;
+      padding: 8px 14px;
       border: none;
       border-radius: 6px;
       background-color: #27ae60;
@@ -133,6 +121,26 @@
       font-size: 14px;
     }
     #bot-send:hover { background-color: #2ecc71; }
+    #btn-mic {
+      padding: 8px 14px;
+      border: none;
+      border-radius: 6px;
+      background-color: #8e44ad;
+      color: white;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    #btn-mic:hover { background-color: #9b59b6; }
+
+    /* ===== STATUT IA ===== */
+    #ia-status {
+      color: #aaa;
+      font-size: 12px;
+      text-align: center;
+      margin-top: 8px;
+    }
+    #ia-status.connecte { color: #27ae60; }
+    #ia-status.deconnecte { color: #e74c3c; }
   </style>
 </head>
 <body>
@@ -140,16 +148,19 @@
   <h1>PontuXL</h1>
   <p>Jeu à 4 joueurs — version terrain glissant</p>
 
+  <!-- PLATEAU DE JEU -->
   <div id="game-section">
     <div id="info-bar">
       Tour : <span id="current-player">Vert</span>
-      — Phase : <span id="current-phase">Placement</span>
+      &nbsp;—&nbsp;
+      Phase : <span id="current-phase">Placement</span>
     </div>
 
     <canvas id="board-canvas" width="500" height="500"></canvas>
 
     <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
 
+    <!-- Boutons de direction -->
     <div id="direction-buttons">
       <button onclick="chooseDirection('up')">↑ Haut</button>
       <button onclick="chooseDirection('down')">↓ Bas</button>
@@ -158,35 +169,88 @@
       <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
     </div>
 
+    <!-- Gestion des ponts traversés -->
     <div id="bridge-pick-actions" style="display:none; margin-top:15px; text-align:center;">
       <p id="bridge-pick-label" style="color:#ccc; margin-bottom:8px; font-size:14px;"></p>
-      <button id="btn-pick-remove" onclick="applyBridgePick('remove')" style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#c0392b; color:white;">🗑️ Supprimer</button>
-      <button id="btn-pick-rotate1-ccw" onclick="applyBridgePick('rotate1_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↺ Axe 1 gauche</button>
-      <button id="btn-pick-rotate1-cw"  onclick="applyBridgePick('rotate1_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#2980b9; color:white;">↻ Axe 1 droite</button>
-      <button id="btn-pick-rotate2-ccw" onclick="applyBridgePick('rotate2_ccw')" style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↺ Axe 2 gauche</button>
-      <button id="btn-pick-rotate2-cw"  onclick="applyBridgePick('rotate2_cw')"  style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer; border:none; border-radius:6px; background-color:#8e44ad; color:white;">↻ Axe 2 droite</button>
+      <button id="btn-pick-remove"
+              onclick="applyBridgePick('remove')"
+              style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                     border:none; border-radius:6px; background-color:#c0392b; color:white;">
+        🗑️ Supprimer
+      </button>
+      <button id="btn-pick-rotate1-ccw"
+              onclick="applyBridgePick('rotate1_left')"
+              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                     border:none; border-radius:6px; background-color:#2980b9; color:white;">
+        ↺ Axe 1 gauche
+      </button>
+      <button id="btn-pick-rotate1-cw"
+              onclick="applyBridgePick('rotate1_right')"
+              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                     border:none; border-radius:6px; background-color:#2980b9; color:white;">
+        ↻ Axe 1 droite
+      </button>
+      <button id="btn-pick-rotate2-ccw"
+              onclick="applyBridgePick('rotate2_left')"
+              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                     border:none; border-radius:6px; background-color:#8e44ad; color:white;">
+        ↺ Axe 2 gauche
+      </button>
+      <button id="btn-pick-rotate2-cw"
+              onclick="applyBridgePick('rotate2_right')"
+              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                     border:none; border-radius:6px; background-color:#8e44ad; color:white;">
+        ↻ Axe 2 droite
+      </button>
     </div>
+
+    <!-- Statut connexion IA -->
+    <div id="ia-status" class="deconnecte">⚠️ Serveur IA non connecté (lancer server.pl)</div>
   </div>
 
-  <!-- Bot textuel -->
+  <!-- BOT CHAT TEXTUEL + VOCAL -->
   <div id="bot-section">
     <h2>🤖 PBot — Assistant PontuXL</h2>
     <div id="bot-texts">
-      <p class="bot-msg">PBot : Bonjour ! Je suis PBot, le bot explicateur du jeu PontuXL. En quoi puis-je vous aider ?</p>
+      <p class="bot-msg">PBot : Bonjour ! Je suis PBot. Posez-moi une question par écrit ou cliquez sur 🎤 pour parler.</p>
     </div>
     <div id="bot-input-row">
       <input id="bot-input" type="text" placeholder="Posez votre question ici..." />
       <button id="bot-send" onclick="sendMessage()">Envoyer</button>
+      <button id="btn-mic" onclick="toggleMic()">🎤 Parler</button>
     </div>
   </div>
 
 </section>
 
+<!-- Scripts — ordre important ! -->
+<script src="./tau-prolog.js"></script>
+<script src="./ai_bot.js"></script>
 <script src="./game.js"></script>
 <script src="./board.js"></script>
-<script src="./tau-prolog.js"></script>
 <script src="./chat_bot.js"></script>
 <script src="./prolog_session.js"></script>
 <script src="./main.js"></script>
+
+<script>
+  // Initialiser la session IA tau-Prolog (pour le conseil)
+  if (typeof AI_BOT !== "undefined" && typeof initAISession === "function") {
+      initAISession(AI_BOT);
+  }
+
+  // Mettre à jour le statut de connexion WebSocket
+  setInterval(function() {
+      const status = document.getElementById("ia-status");
+      if (!status) return;
+      if (typeof wsConnected !== "undefined" && wsConnected) {
+          status.className = "connecte";
+          status.innerText = "✅ Serveur IA connecté (SWI-Prolog actif)";
+      } else {
+          status.className = "deconnecte";
+          status.innerText = "⚠️ Serveur IA non connecté — lancer server.pl pour l'IA intelligente";
+      }
+  }, 2000);
+</script>
+
 </body>
 </html>

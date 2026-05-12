@@ -1,3 +1,4 @@
+const AI_BOT = String.raw`
 /* =====================================================================
    ai_bot.pl  —  Intelligence Artificielle pour PontuXL
    =====================================================================
@@ -137,8 +138,8 @@ next_in_cycle(_, [First|_], First).  % fallback
 
 case_valide(X, Y) :-
     integer(X), integer(Y),
-    X >= 0, X =< 5,
-    Y >= 0, Y =< 5.
+    X >= 1, X =< 6,
+    Y >= 1, Y =< 6.
 
 
 /* ---------------------------------------------------------------------
@@ -819,4 +820,4 @@ shallow_loop([Action|Reste], Etat, Joueur, Prof, Heur, Bound, Sum,
 choisir_coup_shallow(Etat, Prof, Heur, Action) :-
     sum_max(Sum),
     shallow(Etat, Prof, Heur, Sum, _, Action),
-    Action \= aucune.
+    Action \= aucune.`

@@ -65,7 +65,7 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 % ----------------------------------------------------------------%
 
-nb_lutins(4).
+nb_lutins(6).
 nb_equipes(4).
 
 mclef(commence,10).
@@ -93,7 +93,7 @@ regle_rep(quipe,5,
        nb_lutins(X),
        write_to_chars(X,X_in_chars).
 
-write_to_chars(4,"4 ").
+write_to_chars(6,"6 ").
 
 
 

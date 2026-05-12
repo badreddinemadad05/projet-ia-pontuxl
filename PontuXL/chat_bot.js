@@ -66,35 +66,128 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 % ----------------------------------------------------------------%
 
-nb_lutins(4).
+nb_lutins(6).
 nb_equipes(4).
 
+% Mots-cles pour les 5 questions du prof
 mclef(commence,10).
+mclef(combien,5).
 mclef(equipe,5).
 mclef(quipe,5).
+mclef(deplacer,5).
+mclef(occup,5).
+mclef(pont,5).
+mclef(conseil,5).
+mclef(conseillezvous,5).
+% Mots-cles pour dialogues supplementaires
+mclef(elimine,5).
+mclef(gagne,5).
+mclef(ordre,5).
+mclef(phase,5).
+mclef(glisse,5).
+mclef(plateau,5).
+mclef(joueur,5).
+mclef(bloqu,5).
 
 % --------------------------------------------------------------- %
+% QUESTION 1 : Qui commence le jeu ?
+% Reponse exacte du prof
 
 regle_rep(commence,1,
- [ qui, commence, le, jeu ],
- [ "par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
+  [ qui, commence, le, jeu ],
+  [ "Par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
 
-% ----------------------------------------------------------------% 
+% ----------------------------------------------------------------%
+% QUESTION 2 : Combien de lutins compte chaque equipe ?
+% Reponse exacte du prof : 6
+
+regle_rep(combien,5,
+  [ [ combien ] ],
+  [ "6" ] ).
 
 regle_rep(equipe,5,
   [ [ combien ], 3, [ lutins ], 5, [ equipe ] ],
-  [ chaque, equipe, compte, X, lutins ]) :- 
-
-       nb_lutins(X).
+  [ "6" ] ).
 
 regle_rep(quipe,5,
   [ [ combien ], 3, [ lutins ], 5, [ quipe ] ],
-  [ "chaque equipe compte ", X_in_chars, "lutins" ]) :- 
+  [ "6" ] ).
 
-       nb_lutins(X),
-       write_to_chars(X,X_in_chars).
+% ----------------------------------------------------------------%
+% QUESTION 3 : Puis-je deplacer un lutin sur une case occupee ?
+% Reponse exacte du prof : Non.
 
-write_to_chars(4,"4 ").
+regle_rep(deplacer,5,
+  [ [ deplacer ] ],
+  [ "Non." ] ).
+
+regle_rep(occup,5,
+  [ [ occup ] ],
+  [ "Non." ] ).
+
+% ----------------------------------------------------------------%
+% QUESTION 4 : Quel pont puis-je retirer apres avoir deplace un lutin ?
+% Reponse exacte du prof
+
+regle_rep(pont,5,
+  [ [ pont ] ],
+  [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+
+% ----------------------------------------------------------------%
+% QUESTION 5 : Conseil IA
+% Mot-cle special CONSEIL_IA detecte par main.js
+
+regle_rep(conseil,5,
+  [ [ conseil ] ],
+  [ "CONSEIL_IA" ] ).
+
+regle_rep(conseillezvous,5,
+  [ [ conseillezvous ] ],
+  [ "CONSEIL_IA" ] ).
+
+% ----------------------------------------------------------------%
+% DIALOGUES SUPPLEMENTAIRES (imagines par les etudiants)
+% ----------------------------------------------------------------%
+
+% Comment est-on elimine ?
+regle_rep(elimine,5,
+  [ [ elimin ] ],
+  [ "Un joueur est elimine lorsque tous ses lutins n'ont plus aucun pont autour d'eux." ] ).
+
+% Qui gagne ?
+regle_rep(gagne,5,
+  [ [ gagne ] ],
+  [ "Le dernier joueur non elimine gagne la partie." ] ).
+
+% Ordre des joueurs
+regle_rep(ordre,5,
+  [ [ ordre ] ],
+  [ "L'ordre de jeu est : verts, puis bleus, puis jaunes, puis rouges." ] ).
+
+% Phases du jeu
+regle_rep(phase,5,
+  [ [ phase ] ],
+  [ "Le jeu comporte deux phases : le placement des lutins sur le plateau, puis la phase de mouvement." ] ).
+
+% Comment glisse un lutin ?
+regle_rep(glisse,5,
+  [ [ glisse ] ],
+  [ "Un lutin glisse en ligne droite jusqu'a rencontrer un bord, un trou ou un autre lutin." ] ).
+
+% Taille du plateau
+regle_rep(plateau,5,
+  [ [ plateau ] ],
+  [ "Le plateau est de taille 6 sur 6. Le coin inferieur gauche est l'origine (0,0)." ] ).
+
+% Combien de joueurs ?
+regle_rep(joueur,5,
+  [ [ joueur ] ],
+  [ "Le jeu se joue a 4 joueurs : verts et jaunes sont humains, bleus et rouges sont des robots." ] ).
+
+% Que faire si on est bloque ?
+regle_rep(bloqu,5,
+  [ [ bloqu ] ],
+  [ "Si aucun de vos lutins ne peut bouger, vous devez retirer un pont de votre choix." ] ).
 
 
 
@@ -303,4 +396,3 @@ string_as_list(W,W).
 
 
 `
-
