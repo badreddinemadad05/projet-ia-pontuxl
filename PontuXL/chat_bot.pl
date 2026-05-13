@@ -65,71 +65,149 @@ prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 % ----------------------------------------------------------------%
 
+% ----------------------------------------------------------------%
+% Donnees generales du jeu
+
 nb_lutins(6).
 nb_equipes(4).
 
+% ----------------------------------------------------------------%
+% Mots-cles principaux
+
+mclef(conseil,20).
+mclef(conseillez,20).
+mclef(conseillezvous,20).
+
 mclef(commence,10).
+mclef(combien,5).
 mclef(equipe,5).
 mclef(quipe,5).
+
 mclef(occupee,5).
 mclef(occupe,5).
+mclef(occup,5).
+mclef(deplacer,5).
+
 mclef(pont,5).
 mclef(retirer,5).
 mclef(enlever,5).
 
-% --------------------------------------------------------------- %
+% Mots-cles supplementaires
 
-regle_rep(commence,1,
- [ qui, commence, le, jeu ],
- [ "par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
+mclef(elimine,5).
+mclef(gagne,5).
+mclef(ordre,5).
+mclef(phase,5).
+mclef(glisse,5).
+mclef(plateau,5).
+mclef(joueur,5).
+mclef(bloqu,5).
 
-% ----------------------------------------------------------------% 
+% ----------------------------------------------------------------%
+% QUESTION 1 : Qui commence le jeu ?
+
+regle_rep(commence,10,
+  [ [ qui ], 5, [ commence ], 5, [ jeu ] ],
+  [ "Par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
+
+% ----------------------------------------------------------------%
+% QUESTION 2 : Combien de lutins compte chaque equipe ?
+
+regle_rep(combien,5,
+  [ [ combien ], 5, [ lutins ] ],
+  [ "6" ] ).
 
 regle_rep(equipe,5,
-  [ [ combien ], 3, [ lutins ], 5, [ equipe ] ],
-  [ chaque, equipe, compte, X, lutins ]) :- 
-
-       nb_lutins(X).
+  [ [ combien ], 5, [ lutins ], 10, [ equipe ] ],
+  [ "6" ] ).
 
 regle_rep(quipe,5,
-  [ [ combien ], 3, [ lutin ], 5, [ quipe ] ],
-  [ "chaque equipe compte ", X_in_chars, "lutins" ]) :- 
-
-       nb_lutins(X),
-       write_to_chars(X,X_in_chars).
-
-write_to_chars(6,"6 ").
+  [ [ combien ], 5, [ lutins ], 10, [ quipe ] ],
+  [ "6" ] ).
 
 % ----------------------------------------------------------------%
-% Dialogues minimum demandés par l'énoncé
-% ----------------------------------------------------------------%
+% QUESTION 3 : Puis-je deplacer un lutin sur une case occupee ?
 
-% Q: Puis-je deplacer un lutin sur une case occupee par un autre lutin ?
-% R: Non.
-regle_rep(occupee,5,
-  [ [ puis, je ], 10, [ deplacer ], 10, [ case ], 10, [ occupee ] ],
-  [ "non." ] ).
-
-% Variante sans "puis-je"
-regle_rep(occupe,5,
+regle_rep(deplacer,5,
   [ [ deplacer ], 10, [ case ], 10, [ occupee ] ],
-  [ "non." ] ).
+  [ "Non." ] ).
 
-% Q: Quel pont puis-je retirer apres avoir deplace un lutin ?
-% R: Il est permis de retirer le pont emprunte ou tout autre pont.
+regle_rep(occupee,5,
+  [ [ occupee ] ],
+  [ "Non." ] ).
+
+regle_rep(occupe,5,
+  [ [ occupe ] ],
+  [ "Non." ] ).
+
+regle_rep(occup,5,
+  [ [ occup ] ],
+  [ "Non." ] ).
+
+% ----------------------------------------------------------------%
+% QUESTION 4 : Quel pont puis-je retirer apres avoir deplace un lutin ?
+
 regle_rep(pont,5,
-  [ [ quel ], 10, [ pont ], 10, [ retirer ] ],
-  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+  [ [ pont ] ],
+  [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
 
 regle_rep(retirer,5,
-  [ [ pont ], 10, [ puis, je ], 10, [ retirer ] ],
-  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+  [ [ retirer ] ],
+  [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
 
 regle_rep(enlever,5,
-  [ [ pont ], 10, [ enlever ] ],
-  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+  [ [ enlever ] ],
+  [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
 
+% ----------------------------------------------------------------%
+% QUESTION 5 : Conseil IA
 
+regle_rep(conseil,20,
+  [ [ conseil ] ],
+  [ "CONSEIL_IA" ] ).
+
+regle_rep(conseillez,20,
+  [ [ conseillez ], 5, [ vous ] ],
+  [ "CONSEIL_IA" ] ).
+
+regle_rep(conseillezvous,20,
+  [ [ conseillezvous ] ],
+  [ "CONSEIL_IA" ] ).
+
+% ----------------------------------------------------------------%
+% DIALOGUES SUPPLEMENTAIRES
+
+regle_rep(elimine,5,
+  [ [ elimin ] ],
+  [ "Un joueur est elimine lorsque tous ses lutins n'ont plus aucun pont autour d'eux." ] ).
+
+regle_rep(gagne,5,
+  [ [ gagne ] ],
+  [ "Le dernier joueur non elimine gagne la partie." ] ).
+
+regle_rep(ordre,5,
+  [ [ ordre ] ],
+  [ "L'ordre de jeu est : verts, puis bleus, puis jaunes, puis rouges." ] ).
+
+regle_rep(phase,5,
+  [ [ phase ] ],
+  [ "Le jeu comporte deux phases : le placement des lutins sur le plateau, puis la phase de mouvement." ] ).
+
+regle_rep(glisse,5,
+  [ [ glisse ] ],
+  [ "Un lutin glisse en ligne droite jusqu'a rencontrer un bord, un trou ou un autre lutin." ] ).
+
+regle_rep(plateau,5,
+  [ [ plateau ] ],
+  [ "Le plateau est de taille 6 sur 6. Le coin inferieur gauche est l'origine (0,0)." ] ).
+
+regle_rep(joueur,5,
+  [ [ joueur ] ],
+  [ "Le jeu se joue a 4 joueurs : verts et jaunes sont humains, bleus et rouges sont des robots." ] ).
+
+regle_rep(bloqu,5,
+  [ [ bloqu ] ],
+  [ "Si aucun de vos lutins ne peut bouger, vous devez retirer un pont de votre choix." ] ).
 
 /* --------------------------------------------------------------------- */
 /*                                                                       */
