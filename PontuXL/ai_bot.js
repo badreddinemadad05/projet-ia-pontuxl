@@ -346,23 +346,20 @@ glisser(X, Y, _, _, _, _, X, Y, []).
 
 
 /* =====================================================================
-   ÉTAPE 2 — POINT D'ENTRÉE POUR JAVASCRIPT
+   POINT D'ENTRÉE SIMPLE / SECOURS POUR JAVASCRIPT
    =====================================================================
 
    choisir_coup(+Etat, -Coup)
-   Reçoit l'état complet du jeu depuis JavaScript (via buildPrologState)
-   et retourne un coup à jouer.
+   --------------------------
+   Cette version simple retourne un premier coup possible.
+   Elle est conservée comme solution de secours et pour compatibilité
+   avec les anciennes versions du projet.
 
-   Format du coup retourné :
-       coup(LutinIndex, Direction, BridgeAction)
-   où :
-       LutinIndex   : entier 1-6 (base 1, JS fera -1)
-       Direction    : up / down / left / right
-       BridgeAction : remove / rotate1_left / rotate1_right /
-                      rotate2_left / rotate2_right
+   La version principale de l'IA utilisée par le serveur Prolog est :
+       choisir_coup_shallow(+Etat, +Profondeur, +Heuristique, -Action)
 
-   Pour l'instant : stub qui joue le premier coup valide trouvé.
-   Sera remplacé par Minimax/Alpha-Beta dans les étapes suivantes.
+   Cette version principale utilise MaxN et un élagage shallow adapté
+   au cas multi-joueurs.
    ===================================================================== */
 
 choisir_coup(Etat, Coup) :-
@@ -681,8 +678,11 @@ choisir_coup_maxn(Etat, Profondeur, Heuristique, Action) :-
 
 
 /* ---------------------------------------------------------------------
-   Mise à jour de choisir_coup/2 pour utiliser MaxN
-   Remplace le stub de l'étape 2.
+   Point d'entrée MaxN
+   -------------------
+   Cette partie calcule un coup avec MaxN.
+   Elle est utilisée comme base de l'IA multi-joueurs avant l'ajout
+   de l'élagage shallow.
    --------------------------------------------------------------------- */
 
 choisir_coup_intelligent(Etat, Coup) :-
