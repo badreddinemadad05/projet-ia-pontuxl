@@ -27,7 +27,7 @@ produire_reponse([fin],[L1]) :-
 produire_reponse(L,Rep) :-
     mclef(M,_), member(M,L),
     clause(regle_rep(M,_,Pattern,Rep),Body),
-    match_pattern(Pattern,P),
+    match_pattern(Pattern,L),
     call(Body), !.
 
 produire_reponse(_,[S1,S2]) :-
@@ -35,7 +35,7 @@ produire_reponse(_,[S1,S2]) :-
     S2 = "Les étudiants vont m'aider, vous le verrez".
 
 match_pattern(Pattern,Lmots) :-
-    sublist(Pattern,L_mots).
+    sublist(Pattern,Lmots).
 
 match_pattern(LPatterns,Lmots) :-
     match_pattern_dist([100|LPatterns],Lmots).
@@ -70,15 +70,21 @@ nb_lutins(6).
 nb_equipes(4).
 
 % Mots-cles pour les 5 questions du prof
+mclef(conseil,20).
+mclef(conseillez,20).
+mclef(conseillezvous,20).
+
 mclef(commence,10).
 mclef(combien,5).
 mclef(equipe,5).
 mclef(quipe,5).
-mclef(deplacer,5).
+
+mclef(occupee,5).
+mclef(occupe,5).
 mclef(occup,5).
+mclef(deplacer,5).
+
 mclef(pont,5).
-mclef(conseil,5).
-mclef(conseillezvous,5).
 % Mots-cles pour dialogues supplementaires
 mclef(elimine,5).
 mclef(gagne,5).
@@ -118,8 +124,21 @@ regle_rep(quipe,5,
 % Reponse exacte du prof : Non.
 
 regle_rep(deplacer,5,
-  [ [ deplacer ] ],
+  [ [ deplacer ], 10, [ case ], 10, [ occupee ] ],
   [ "Non." ] ).
+  
+regle_rep(occupee,5,
+  [ [ occupee ] ],
+  [ "Non." ] ).
+
+regle_rep(occupe,5,
+  [ [ occupe ] ],
+  [ "Non." ] ).
+
+regle_rep(occup,5,
+  [ [ occup ] ],
+  [ "Non." ] ).
+  
 
 regle_rep(occup,5,
   [ [ occup ] ],
@@ -137,11 +156,15 @@ regle_rep(pont,5,
 % QUESTION 5 : Conseil IA
 % Mot-cle special CONSEIL_IA detecte par main.js
 
-regle_rep(conseil,5,
+regle_rep(conseil,20,
   [ [ conseil ] ],
   [ "CONSEIL_IA" ] ).
 
-regle_rep(conseillezvous,5,
+regle_rep(conseillez,20,
+  [ [ conseillez ], 5, [ vous ] ],
+  [ "CONSEIL_IA" ] ).
+
+regle_rep(conseillezvous,20,
   [ [ conseillezvous ] ],
   [ "CONSEIL_IA" ] ).
 
