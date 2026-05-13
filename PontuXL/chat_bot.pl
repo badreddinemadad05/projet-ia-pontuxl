@@ -71,6 +71,11 @@ nb_equipes(4).
 mclef(commence,10).
 mclef(equipe,5).
 mclef(quipe,5).
+mclef(occupee,5).
+mclef(occupe,5).
+mclef(pont,5).
+mclef(retirer,5).
+mclef(enlever,5).
 
 % --------------------------------------------------------------- %
 
@@ -94,6 +99,35 @@ regle_rep(quipe,5,
        write_to_chars(X,X_in_chars).
 
 write_to_chars(6,"6 ").
+
+% ----------------------------------------------------------------%
+% Dialogues minimum demandés par l'énoncé
+% ----------------------------------------------------------------%
+
+% Q: Puis-je deplacer un lutin sur une case occupee par un autre lutin ?
+% R: Non.
+regle_rep(occupee,5,
+  [ [ puis, je ], 10, [ deplacer ], 10, [ case ], 10, [ occupee ] ],
+  [ "non." ] ).
+
+% Variante sans "puis-je"
+regle_rep(occupe,5,
+  [ [ deplacer ], 10, [ case ], 10, [ occupee ] ],
+  [ "non." ] ).
+
+% Q: Quel pont puis-je retirer apres avoir deplace un lutin ?
+% R: Il est permis de retirer le pont emprunte ou tout autre pont.
+regle_rep(pont,5,
+  [ [ quel ], 10, [ pont ], 10, [ retirer ] ],
+  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+
+regle_rep(retirer,5,
+  [ [ pont ], 10, [ puis, je ], 10, [ retirer ] ],
+  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+
+regle_rep(enlever,5,
+  [ [ pont ], 10, [ enlever ] ],
+  [ "il est permis de retirer le pont emprunte ou tout autre pont." ] ).
 
 
 
