@@ -150,7 +150,7 @@ regle_rep(occup,5,
 
 regle_rep(pont,5,
   [ [ pont ] ],
-  [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
+  [ "Pour chaque pont traverse lors de la glissade, vous devez choisir de le retirer ou de lui faire faire un quart de tour." ] ).
 
 % ----------------------------------------------------------------%
 % QUESTION 5 : Conseil IA
