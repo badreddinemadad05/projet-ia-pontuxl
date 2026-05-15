@@ -636,7 +636,7 @@ function jouerAleatoire(player) {
                 for (let b of result)
                     if (bridgeExists(b[0], b[1], b[2], b[3])) {
                         removeBridge(b[0], b[1], b[2], b[3]);
-                        break;
+                        
                     }
                 drawBoard();
                 finishTurn();
@@ -650,6 +650,19 @@ function jouerAleatoire(player) {
 
 function appliquerCoupProlog(coupStr, player) {
     try {
+        // Cas joueur bloqué
+        let matchPont = coupStr.match(/retirer_pont_libre\(pont\((\d+),(\d+),(\d+),(\d+)\)\)/);
+        if (matchPont) {
+            let x1 = parseInt(matchPont[1]), y1 = parseInt(matchPont[2]);
+            let x2 = parseInt(matchPont[3]), y2 = parseInt(matchPont[4]);
+            removeBridge(x1, y1, x2, y2);
+            checkAllEliminations();
+            drawBoard();
+            finishTurn();
+            return true;
+        }
+
+        // Cas mouvement normal
         let match = coupStr.match(/mouvement\((\d+),(\d+),(\w+),/);
         if (!match) {
             console.warn("Format coup invalide:", coupStr);
@@ -658,24 +671,19 @@ function appliquerCoupProlog(coupStr, player) {
         let jsX = parseInt(match[1]);
         let jsY = parseInt(match[2]);
         let dir = match[3];
-
-        console.log("Appliquer coup:", jsX, jsY, dir, "joueur:", player);
-
         let idx = lutins[player].findIndex(p => p[0] === jsX && p[1] === jsY);
         if (idx === -1) {
-            console.warn("Lutin introuvable en", jsX, jsY, "- lutins:", JSON.stringify(lutins[player]));
+            console.warn("Lutin introuvable en", jsX, jsY);
             return false;
         }
         let result = moveLutin(idx, dir);
-        if (result === null) {
-            console.warn("moveLutin retourne null pour idx:", idx, "dir:", dir);
-            return false;
-        }
-        for (let b of result)
+        if (result === null) return false;
+        for (let b of result){
             if (bridgeExists(b[0], b[1], b[2], b[3])) {
                 removeBridge(b[0], b[1], b[2], b[3]);
-                break;
+                
             }
+        }
         drawBoard();
         finishTurn();
         return true;
@@ -684,23 +692,10 @@ function appliquerCoupProlog(coupStr, player) {
         return false;
     }
 }
-
 function handleAIMove() {
     let player = currentPlayer();
 
-    if (!canPlayerMove(player)) {
-        let allB = getAllBridges();
-        if (allB.length > 0) {
-            let b = allB[Math.floor(Math.random() * allB.length)];
-            removeBridge(b[0], b[1], b[2], b[3]);
-        }
-        drawBoard();
-        finishTurn();
-        return;
-    }
-
     if (wsConnected && ws) {
-        // IA intelligente via SWI-Prolog
         let msg = JSON.stringify({
             etat: buildPrologState(),
             profondeur: 2,
@@ -718,7 +713,6 @@ function handleAIMove() {
         };
         ws.send(msg);
     } else {
-        // Fallback aleatoire si serveur non lance
         jouerAleatoire(player);
     }
 }
