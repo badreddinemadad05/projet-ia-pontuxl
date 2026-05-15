@@ -633,11 +633,12 @@ function jouerAleatoire(player) {
         for (let dir of dirs) {
             let result = moveLutin(i, dir);
             if (result !== null) {
-                for (let b of result)
+                for (let b of result){
                     if (bridgeExists(b[0], b[1], b[2], b[3])) {
                         removeBridge(b[0], b[1], b[2], b[3]);
                         
                     }
+                }
                 drawBoard();
                 finishTurn();
                 return;
@@ -696,10 +697,11 @@ function handleAIMove() {
     let player = currentPlayer();
 
     if (wsConnected && ws) {
+        let heuristique = (player === "blue") ? "h1" : "h2";
         let msg = JSON.stringify({
             etat: buildPrologState(),
             profondeur: 2,
-            heuristique: "h1"
+            heuristique: heuristique
         });
         let timeout = setTimeout(() => {
             wsPendingCallback = null;
