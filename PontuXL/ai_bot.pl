@@ -123,12 +123,13 @@ joueur_suivant(Courant, Elimines, Suivant) :-
     ->  joueur_suivant(Candidat, Elimines, Suivant)
     ;   Suivant = Candidat
     ).
+next_in_cycle(X, Liste, Y) :-
+    next_in_cycle_aux(X, Liste, Liste, Y).
 
-next_in_cycle(X, [X, Y | _], Y) :- !.
-next_in_cycle(X, [_ | Rest], Y) :- next_in_cycle(X, Rest, Y).
-next_in_cycle(_, [Y], Y) :- !.   % boucle : dernier -> premier
-next_in_cycle(_, [First|_], First).  % fallback
-
+next_in_cycle_aux(X, [X, Y | _], _, Y) :- !.
+next_in_cycle_aux(X, [X], [Y | _], Y) :- !.
+next_in_cycle_aux(X, [_ | Rest], ListeComplete, Y) :-
+    next_in_cycle_aux(X, Rest, ListeComplete, Y).
 
 /* ---------------------------------------------------------------------
    case_valide(+X, +Y)
