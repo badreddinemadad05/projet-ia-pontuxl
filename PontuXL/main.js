@@ -133,7 +133,9 @@ function initVocal() {
     if (!window.SpeechRecognition) {
         console.warn("SpeechRecognition non supporté dans ce navigateur.");
         const btn = document.getElementById("btn-mic");
-        if (btn) { btn.style.display = "none"; }
+        if (btn) {
+            btn.style.display = "none";
+        }
         return;
     }
 
@@ -165,7 +167,9 @@ function initVocal() {
 }
 
 function demarrerMic() {
-    if (!recognition) { initVocal(); }
+    if (!recognition) {
+        initVocal();
+    }
     if (!recognition) return;
 
     micActif = true;
@@ -177,7 +181,7 @@ function demarrerMic() {
     afficherBot("Je vous écoute, parlez maintenant...");
     try {
         recognition.start();
-    } catch(e) {
+    } catch (e) {
         console.warn("Reconnaissance vocale déjà active");
     }
 }
@@ -190,7 +194,10 @@ function arreterMic() {
         btn.innerText = "🎤 Parler";
     }
     if (recognition) {
-        try { recognition.stop(); } catch(e) {}
+        try {
+            recognition.stop();
+        } catch (e) {
+        }
     }
 }
 

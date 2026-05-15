@@ -70,9 +70,9 @@ function initBridges() {
 function initGame() {
     currentPlayerIndex = 0;
     phase = "placement";
-    eliminated = { green: false, blue: false, yellow: false, red: false };
-    lutinsPlaced = { green: 0, blue: 0, yellow: 0, red: 0 };
-    lutins = { green: [], blue: [], yellow: [], red: [] };
+    eliminated = {green: false, blue: false, yellow: false, red: false};
+    lutinsPlaced = {green: 0, blue: 0, yellow: 0, red: 0};
+    lutins = {green: [], blue: [], yellow: [], red: []};
     initBridges();
 }
 
@@ -129,9 +129,9 @@ function removeBridge(x1, y1, x2, y2) {
 
 // directions possibles : haut, bas, gauche, droite
 const DIRECTIONS = {
-    up:    [0, 1],
-    down:  [0, -1],
-    left:  [-1, 0],
+    up: [0, 1],
+    down: [0, -1],
+    left: [-1, 0],
     right: [1, 0]
 };
 
@@ -271,9 +271,15 @@ function handleBridgeAction(x1, y1, x2, y2, action) {
     // Déterminer l'axe
     let ax, ay, bx, by;
     if (action.startsWith("rotate1")) {
-        ax = x1; ay = y1; bx = x2; by = y2;
+        ax = x1;
+        ay = y1;
+        bx = x2;
+        by = y2;
     } else {
-        ax = x2; ay = y2; bx = x1; by = y1;
+        ax = x2;
+        ay = y2;
+        bx = x1;
+        by = y1;
     }
 
     let isVertical = (x1 === x2); // même x = pont vertical

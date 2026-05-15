@@ -89,27 +89,20 @@ joueur_suivant(Courant, Elimines, Suivant) :-
     ->  joueur_suivant(Candidat, Elimines, Suivant)
     ;   Suivant = Candidat
     ).
+
+
 next_in_cycle(X, Liste, Y) :-
     next_in_cycle_aux(X, Liste, Liste, Y).
 
-<<<<<<< HEAD
-=======
-next_in_cycle(X, Liste, Y) :-
-    next_in_cycle_aux(X, Liste, Liste, Y).
-
->>>>>>> d1e22cc (heyyy)
 next_in_cycle_aux(X, [X, Y | _], _, Y) :- !.
 next_in_cycle_aux(X, [X], [Y | _], Y) :- !.
 next_in_cycle_aux(X, [_ | Rest], ListeComplete, Y) :-
     next_in_cycle_aux(X, Rest, ListeComplete, Y).
-<<<<<<< HEAD
 
 /* ---------------------------------------------------------------------
    case_valide(+X, +Y)
    Vrai si (X,Y) est une case du plateau 6x6.
    --------------------------------------------------------------------- */
-=======
->>>>>>> d1e22cc (heyyy)
 
 case_valide(X, Y) :-
     integer(X), integer(Y),
@@ -194,7 +187,29 @@ actions_possibles(etat(_, Lutins, Ponts, _, mouvement), Joueur,
     direction_delta(Dir, Dx, Dy),
     glisser(X, Y, Dx, Dy, Lutins, Ponts, _, _, PontsTraverses),
     PontsTraverses \= [].
+/* ---------------------------------------------------------------------
+   CAS 3 : joueur bloque mais pas elimine
+   Si le joueur ne peut deplacer aucun lutin, il peut retirer un pont
+   de son choix.
+   --------------------------------------------------------------------- */
 
+actions_possibles(etat(_, Lutins, Ponts, Elimines, mouvement), Joueur,
+                  retirer_pont_libre(pont(X1, Y1, X2, Y2))) :-
+    \+ member(Joueur, Elimines),
+    \+ mouvement_possible(Joueur, Lutins, Ponts),
+    member(pont(X1, Y1, X2, Y2), Ponts).
+/* ---------------------------------------------------------------------
+   mouvement_possible(+Joueur, +Lutins, +Ponts)
+   Vrai si au moins un lutin du joueur peut glisser dans une direction.
+   --------------------------------------------------------------------- */
+
+mouvement_possible(Joueur, Lutins, Ponts) :-
+    member(lutin(Joueur, X, Y), Lutins),
+    member(Dir, [up, down, left, right]),
+    direction_delta(Dir, Dx, Dy),
+    glisser(X, Y, Dx, Dy, Lutins, Ponts, _, _, PontsTraverses),
+    PontsTraverses \= [],
+    !.
 direction_delta(up,    0,  1).
 direction_delta(down,  0, -1).
 direction_delta(left, -1,  0).
@@ -213,9 +228,7 @@ glisser(X, Y, Dx, Dy, Lutins, Ponts, EndX, EndY, PontsTraverses) :-
 
 glisser(X, Y, _, _, _, _, X, Y, []).
 
-
 /* =====================================================================
-<<<<<<< HEAD
    POINT D'ENTRÉE SIMPLE / SECOURS POUR JAVASCRIPT
    =====================================================================
 
@@ -230,9 +243,6 @@ glisser(X, Y, _, _, _, _, X, Y, []).
 
    Cette version principale utilise MaxN et un élagage shallow adapté
    au cas multi-joueurs.
-=======
-   POINT D'ENTRÉE SECOURS
->>>>>>> d1e22cc (heyyy)
    ===================================================================== */
 
 choisir_coup(Etat, Coup) :-
@@ -267,17 +277,23 @@ appliquer(etat(Joueur, Lutins, Ponts, Elimines, mouvement),
           etat(Suivant, LutinsMaj, PontsMaj, NouveauxElimines, mouvement)) :-
     direction_delta(Dir, Dx, Dy),
     glisser(X, Y, Dx, Dy, Lutins, Ponts, EndX, EndY, PontsTraverses),
-    select(lutin(Joueur, X, Y), Lutins, LufinsSansOld),
-    append(LufinsSansOld, [lutin(Joueur, EndX, EndY)], LutinsMaj),
+    select(lutin(Joueur, X, Y), Lutins, LutinsSansOld),
+    append(LutinsSansOld, [lutin(Joueur, EndX, EndY)], LutinsMaj),
     supprimer_ponts(PontsTraverses, Ponts, PontsMaj),
     mettre_a_jour_elimines(LutinsMaj, PontsMaj, Elimines, NouveauxElimines),
+    joueur_suivant(Joueur, NouveauxElimines, Suivant).
+
+appliquer(etat(Joueur, Lutins, Ponts, Elimines, mouvement),
+          retirer_pont_libre(pont(X1, Y1, X2, Y2)),
+          etat(Suivant, Lutins, PontsMaj, NouveauxElimines, mouvement)) :-
+    retirer_pont(X1, Y1, X2, Y2, Ponts, PontsMaj),
+    mettre_a_jour_elimines(Lutins, PontsMaj, Elimines, NouveauxElimines),
     joueur_suivant(Joueur, NouveauxElimines, Suivant).
 
 supprimer_ponts([], Ponts, Ponts).
 supprimer_ponts([pont(X1,Y1,X2,Y2) | Reste], PontsIn, PontsOut) :-
     retirer_pont(X1, Y1, X2, Y2, PontsIn, PontsTmp),
     supprimer_ponts(Reste, PontsTmp, PontsOut).
-
 
 /* =====================================================================
    HEURISTIQUE 1 : mobilité totale
@@ -373,7 +389,6 @@ choisir_coup_maxn(Etat, Profondeur, Heuristique, Action) :-
     maxn(Etat, Profondeur, Heuristique, _, Action),
     Action \= aucune.
 
-<<<<<<< HEAD
 
 /* ---------------------------------------------------------------------
    Point d'entrée MaxN
@@ -383,10 +398,9 @@ choisir_coup_maxn(Etat, Profondeur, Heuristique, Action) :-
    de l'élagage shallow.
    --------------------------------------------------------------------- */
 
-=======
->>>>>>> d1e22cc (heyyy)
 choisir_coup_intelligent(Etat, Coup) :-
     choisir_coup_maxn(Etat, 2, h1, Coup), !.
+
 choisir_coup_intelligent(Etat, Coup) :-
     Etat = etat(Joueur, _, _, _, _),
     actions_possibles(Etat, Joueur, Coup), !.
@@ -394,13 +408,13 @@ choisir_coup_intelligent(Etat, Coup) :-
 
 /* =====================================================================
    SHALLOW PRUNING (Korf 1991, section 3.2)
-
-   Pourquoi pas deep pruning : impossible a 4 joueurs (Korf, section 3.4).
-   Un noeud prune peut quand meme influencer la racine via d'autres joueurs.
-
+   
+   Pourquoi pas deep pruning : impossible à 4 joueurs (Korf, section 3.4).
+   Un nœud pruné peut quand même influencer la racine via d'autres joueurs.
+   
    Shallow pruning valide sous deux conditions (Theorem 1) :
-   1. Borne inferieure >= 0 sur chaque composante (nb ponts >= 0) OK
-   2. Borne superieure sur la SOMME : 4 x 6 x 4 = 96 OK
+   1. Borne inférieure >= 0 sur chaque composante (nb ponts >= 0) ✅
+   2. Borne supérieure sur la SOMME : 4 × 6 × 4 = 96 ✅
    ===================================================================== */
 
 sum_max(96).
@@ -455,4 +469,4 @@ choisir_coup_shallow(Etat, Prof, Heur, Action) :-
     sum_max(Sum),
     shallow(Etat, Prof, Heur, Sum, _, Action),
     Action \= aucune.
-`
+    `;

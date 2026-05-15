@@ -1,225 +1,259 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>PontuXL — Jeu</title>
-  <link rel="stylesheet" href="style.css">
-  <style>
-    /* ===== PLATEAU ===== */
-    #game-section {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      padding: 20px;
-      width: 100%;
-    }
-    #info-bar {
-      color: white;
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    #info-bar span {
-      font-weight: bold;
-      padding: 4px 12px;
-      border-radius: 6px;
-    }
-    #board-canvas {
-      border: 2px solid #555;
-      border-radius: 8px;
-      cursor: pointer;
-      background-color: #f5f0e1;
-    }
-    #message-box {
-      color: #ccc;
-      font-size: 16px;
-      margin-top: 15px;
-      text-align: center;
-      min-height: 24px;
-    }
-    #direction-buttons {
-      margin-top: 15px;
-      display: none;
-    }
-    #direction-buttons button {
-      padding: 10px 20px;
-      margin: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      border: none;
-      border-radius: 6px;
-      background-color: #555;
-      color: white;
-    }
-    #direction-buttons button:hover { background-color: #888; }
+    <meta charset="UTF-8">
+    <title>PontuXL — Jeu</title>
+    <link href="style.css" rel="stylesheet">
+    <style>
+        /* ===== PLATEAU ===== */
+        #game-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            width: 100%;
+        }
 
-    /* ===== BOT CHAT ===== */
-    #bot-section {
-      width: 90%;
-      max-width: 520px;
-      margin: 30px auto 0 auto;
-      background-color: #2d2d2d;
-      border-radius: 10px;
-      padding: 15px;
-    }
-    #bot-section h2 {
-      color: rgba(255,255,255,0.7);
-      font-size: 18px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-    #bot-texts {
-      height: 220px;
-      overflow-y: auto;
-      margin-bottom: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      padding: 5px;
-    }
-    #bot-texts p {
-      margin: 0;
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-size: 14px;
-      width: fit-content;
-      max-width: 90%;
-      white-space: pre-line;
-    }
-    #bot-texts p.user-msg {
-      background-color: #3a3a5c;
-      color: #ccc;
-      align-self: flex-end;
-      text-align: right;
-    }
-    #bot-texts p.bot-msg {
-      background-color: #1a4a2a;
-      color: #aee;
-      align-self: flex-start;
-    }
-    #bot-input-row {
-      display: flex;
-      gap: 8px;
-    }
-    #bot-input {
-      flex: 1;
-      padding: 8px 12px;
-      border-radius: 6px;
-      border: none;
-      font-size: 14px;
-      background-color: #444;
-      color: white;
-    }
-    #bot-input::placeholder { color: #999; }
-    #bot-send {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      background-color: #27ae60;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    #bot-send:hover { background-color: #2ecc71; }
-    #btn-mic {
-      padding: 8px 14px;
-      border: none;
-      border-radius: 6px;
-      background-color: #8e44ad;
-      color: white;
-      cursor: pointer;
-      font-size: 14px;
-    }
-    #btn-mic:hover { background-color: #9b59b6; }
+        #info-bar {
+            color: white;
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
 
-    /* ===== STATUT IA ===== */
-    #ia-status {
-      color: #aaa;
-      font-size: 12px;
-      text-align: center;
-      margin-top: 8px;
-    }
-    #ia-status.connecte { color: #27ae60; }
-    #ia-status.deconnecte { color: #e74c3c; }
-  </style>
+        #info-bar span {
+            font-weight: bold;
+            padding: 4px 12px;
+            border-radius: 6px;
+        }
+
+        #board-canvas {
+            border: 2px solid #555;
+            border-radius: 8px;
+            cursor: pointer;
+            background-color: #f5f0e1;
+        }
+
+        #message-box {
+            color: #ccc;
+            font-size: 16px;
+            margin-top: 15px;
+            text-align: center;
+            min-height: 24px;
+        }
+
+        #direction-buttons {
+            margin-top: 15px;
+            display: none;
+        }
+
+        #direction-buttons button {
+            padding: 10px 20px;
+            margin: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            background-color: #555;
+            color: white;
+        }
+
+        #direction-buttons button:hover {
+            background-color: #888;
+        }
+
+        /* ===== BOT CHAT ===== */
+        #bot-section {
+            width: 90%;
+            max-width: 520px;
+            margin: 30px auto 0 auto;
+            background-color: #2d2d2d;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        #bot-section h2 {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        #bot-texts {
+            height: 220px;
+            overflow-y: auto;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            padding: 5px;
+        }
+
+        #bot-texts p {
+            margin: 0;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            width: fit-content;
+            max-width: 90%;
+            white-space: pre-line;
+        }
+
+        #bot-texts p.user-msg {
+            background-color: #3a3a5c;
+            color: #ccc;
+            align-self: flex-end;
+            text-align: right;
+        }
+
+        #bot-texts p.bot-msg {
+            background-color: #1a4a2a;
+            color: #aee;
+            align-self: flex-start;
+        }
+
+        #bot-input-row {
+            display: flex;
+            gap: 8px;
+        }
+
+        #bot-input {
+            flex: 1;
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            font-size: 14px;
+            background-color: #444;
+            color: white;
+        }
+
+        #bot-input::placeholder {
+            color: #999;
+        }
+
+        #bot-send {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #27ae60;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #bot-send:hover {
+            background-color: #2ecc71;
+        }
+
+        #btn-mic {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 6px;
+            background-color: #8e44ad;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        #btn-mic:hover {
+            background-color: #9b59b6;
+        }
+
+        /* ===== STATUT IA ===== */
+        #ia-status {
+            color: #aaa;
+            font-size: 12px;
+            text-align: center;
+            margin-top: 8px;
+        }
+
+        #ia-status.connecte {
+            color: #27ae60;
+        }
+
+        #ia-status.deconnecte {
+            color: #e74c3c;
+        }
+    </style>
 </head>
 <body>
 <section>
-  <h1>PontuXL</h1>
-  <p>Jeu à 4 joueurs — version terrain glissant</p>
+    <h1>PontuXL</h1>
+    <p>Jeu à 4 joueurs — version terrain glissant</p>
 
-  <!-- PLATEAU DE JEU -->
-  <div id="game-section">
-    <div id="info-bar">
-      Tour : <span id="current-player">Vert</span>
-      &nbsp;—&nbsp;
-      Phase : <span id="current-phase">Placement</span>
-    </div>
+    <!-- PLATEAU DE JEU -->
+    <div id="game-section">
+        <div id="info-bar">
+            Tour : <span id="current-player">Vert</span>
+            &nbsp;—&nbsp;
+            Phase : <span id="current-phase">Placement</span>
+        </div>
 
-    <canvas id="board-canvas" width="500" height="500"></canvas>
+        <canvas height="500" id="board-canvas" width="500"></canvas>
 
-    <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
+        <div id="message-box">Cliquez sur une case pour placer un lutin vert.</div>
 
-    <!-- Boutons de direction -->
-    <div id="direction-buttons">
-      <button onclick="chooseDirection('up')">↑ Haut</button>
-      <button onclick="chooseDirection('down')">↓ Bas</button>
-      <button onclick="chooseDirection('left')">← Gauche</button>
-      <button onclick="chooseDirection('right')">→ Droite</button>
-      <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
-    </div>
+        <!-- Boutons de direction -->
+        <div id="direction-buttons">
+            <button onclick="chooseDirection('up')">↑ Haut</button>
+            <button onclick="chooseDirection('down')">↓ Bas</button>
+            <button onclick="chooseDirection('left')">← Gauche</button>
+            <button onclick="chooseDirection('right')">→ Droite</button>
+            <button onclick="cancelSelection()" style="background-color:#888;">Annuler</button>
+        </div>
 
-    <!-- Gestion des ponts traversés -->
-    <div id="bridge-pick-actions" style="display:none; margin-top:15px; text-align:center;">
-      <p id="bridge-pick-label" style="color:#ccc; margin-bottom:8px; font-size:14px;"></p>
-      <button id="btn-pick-remove"
-              onclick="applyBridgePick('remove')"
-              style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+        <!-- Gestion des ponts traversés -->
+        <div id="bridge-pick-actions" style="display:none; margin-top:15px; text-align:center;">
+            <p id="bridge-pick-label" style="color:#ccc; margin-bottom:8px; font-size:14px;"></p>
+            <button id="btn-pick-remove"
+                    onclick="applyBridgePick('remove')"
+                    style="padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
                      border:none; border-radius:6px; background-color:#c0392b; color:white;">
-        🗑️ Supprimer
-      </button>
-      <button id="btn-pick-rotate1-ccw"
-              onclick="applyBridgePick('rotate1_left')"
-              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                🗑️ Supprimer
+            </button>
+            <button id="btn-pick-rotate1-ccw"
+                    onclick="applyBridgePick('rotate1_left')"
+                    style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
                      border:none; border-radius:6px; background-color:#2980b9; color:white;">
-        ↺ Axe 1 gauche
-      </button>
-      <button id="btn-pick-rotate1-cw"
-              onclick="applyBridgePick('rotate1_right')"
-              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                ↺ Axe 1 gauche
+            </button>
+            <button id="btn-pick-rotate1-cw"
+                    onclick="applyBridgePick('rotate1_right')"
+                    style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
                      border:none; border-radius:6px; background-color:#2980b9; color:white;">
-        ↻ Axe 1 droite
-      </button>
-      <button id="btn-pick-rotate2-ccw"
-              onclick="applyBridgePick('rotate2_left')"
-              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                ↻ Axe 1 droite
+            </button>
+            <button id="btn-pick-rotate2-ccw"
+                    onclick="applyBridgePick('rotate2_left')"
+                    style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
                      border:none; border-radius:6px; background-color:#8e44ad; color:white;">
-        ↺ Axe 2 gauche
-      </button>
-      <button id="btn-pick-rotate2-cw"
-              onclick="applyBridgePick('rotate2_right')"
-              style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
+                ↺ Axe 2 gauche
+            </button>
+            <button id="btn-pick-rotate2-cw"
+                    onclick="applyBridgePick('rotate2_right')"
+                    style="display:none; padding:10px 20px; margin:5px; font-size:15px; cursor:pointer;
                      border:none; border-radius:6px; background-color:#8e44ad; color:white;">
-        ↻ Axe 2 droite
-      </button>
+                ↻ Axe 2 droite
+            </button>
+        </div>
+
+        <!-- Statut connexion IA -->
+        <div class="deconnecte" id="ia-status">⚠️ Serveur IA non connecté (lancer server.pl)</div>
     </div>
 
-    <!-- Statut connexion IA -->
-    <div id="ia-status" class="deconnecte">⚠️ Serveur IA non connecté (lancer server.pl)</div>
-  </div>
-
-  <!-- BOT CHAT TEXTUEL + VOCAL -->
-  <div id="bot-section">
-    <h2>🤖 PBot — Assistant PontuXL</h2>
-    <div id="bot-texts">
-      <p class="bot-msg">PBot : Bonjour ! Je suis PBot. Posez-moi une question par écrit ou cliquez sur 🎤 pour parler.</p>
+    <!-- BOT CHAT TEXTUEL + VOCAL -->
+    <div id="bot-section">
+        <h2>🤖 PBot — Assistant PontuXL</h2>
+        <div id="bot-texts">
+            <p class="bot-msg">PBot : Bonjour ! Je suis PBot. Posez-moi une question par écrit ou cliquez sur 🎤 pour
+                parler.</p>
+        </div>
+        <div id="bot-input-row">
+            <input id="bot-input" placeholder="Posez votre question ici..." type="text"/>
+            <button id="bot-send" onclick="sendMessage()">Envoyer</button>
+            <button id="btn-mic" onclick="toggleMic()">🎤 Parler</button>
+        </div>
     </div>
-    <div id="bot-input-row">
-      <input id="bot-input" type="text" placeholder="Posez votre question ici..." />
-      <button id="bot-send" onclick="sendMessage()">Envoyer</button>
-      <button id="btn-mic" onclick="toggleMic()">🎤 Parler</button>
-    </div>
-  </div>
 
 </section>
 
@@ -233,23 +267,23 @@
 <script src="./main.js"></script>
 
 <script>
-  // Initialiser la session IA tau-Prolog (pour le conseil)
-  if (typeof AI_BOT !== "undefined" && typeof initAISession === "function") {
-      initAISession(AI_BOT);
-  }
+    // Initialiser la session IA tau-Prolog (pour le conseil)
+    if (typeof AI_BOT !== "undefined" && typeof initAISession === "function") {
+        initAISession(AI_BOT);
+    }
 
-  // Mettre à jour le statut de connexion WebSocket
-  setInterval(function() {
-      const status = document.getElementById("ia-status");
-      if (!status) return;
-      if (typeof wsConnected !== "undefined" && wsConnected) {
-          status.className = "connecte";
-          status.innerText = "✅ Serveur IA connecté (SWI-Prolog actif)";
-      } else {
-          status.className = "deconnecte";
-          status.innerText = "⚠️ Serveur IA non connecté — lancer server.pl pour l'IA intelligente";
-      }
-  }, 2000);
+    // Mettre à jour le statut de connexion WebSocket
+    setInterval(function () {
+        const status = document.getElementById("ia-status");
+        if (!status) return;
+        if (typeof wsConnected !== "undefined" && wsConnected) {
+            status.className = "connecte";
+            status.innerText = "✅ Serveur IA connecté (SWI-Prolog actif)";
+        } else {
+            status.className = "deconnecte";
+            status.innerText = "⚠️ Serveur IA non connecté — lancer server.pl pour l'IA intelligente";
+        }
+    }, 2000);
 </script>
 
 </body>
