@@ -62,16 +62,12 @@ prefixrem([],L,L).
 prefixrem([H|T],[H|L],Lr) :- prefixrem(T,L,Lr).
 
 
-
-% ----------------------------------------------------------------%
-
-% ----------------------------------------------------------------%
 % Donnees generales du jeu
 
 nb_lutins(6).
 nb_equipes(4).
 
-% ----------------------------------------------------------------%
+
 % Mots-cles principaux
 
 mclef(conseil,20).
@@ -103,14 +99,14 @@ mclef(plateau,5).
 mclef(joueur,5).
 mclef(bloqu,5).
 
-% ----------------------------------------------------------------%
+
 % QUESTION 1 : Qui commence le jeu ?
 
 regle_rep(commence,10,
   [ [ qui ], 5, [ commence ], 5, [ jeu ] ],
   [ "Par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
 
-% ----------------------------------------------------------------%
+
 % QUESTION 2 : Combien de lutins compte chaque equipe ?
 
 regle_rep(combien,5,
@@ -125,7 +121,6 @@ regle_rep(quipe,5,
   [ [ combien ], 5, [ lutins ], 10, [ quipe ] ],
   [ "6" ] ).
 
-% ----------------------------------------------------------------%
 % QUESTION 3 : Puis-je deplacer un lutin sur une case occupee ?
 
 regle_rep(deplacer,5,
@@ -144,7 +139,7 @@ regle_rep(occup,5,
   [ [ occup ] ],
   [ "Non." ] ).
 
-% ----------------------------------------------------------------%
+
 % QUESTION 4 : Quel pont puis-je retirer apres avoir deplace un lutin ?
 
 regle_rep(pont,5,
@@ -159,7 +154,7 @@ regle_rep(enlever,5,
   [ [ enlever ] ],
   [ "Il est permis de retirer le pont emprunte ou tout autre pont." ] ).
 
-% ----------------------------------------------------------------%
+
 % QUESTION 5 : Conseil IA
 
 regle_rep(conseil,20,
@@ -174,8 +169,8 @@ regle_rep(conseillezvous,20,
   [ [ conseillezvous ] ],
   [ "CONSEIL_IA" ] ).
 
-% ----------------------------------------------------------------%
-% DIALOGUES SUPPLEMENTAIRES
+
+% dialogue imaginé
 
 regle_rep(elimine,5,
   [ [ elimin ] ],
@@ -209,12 +204,6 @@ regle_rep(bloqu,5,
   [ [ bloqu ] ],
   [ "Si aucun de vos lutins ne peut bouger, vous devez retirer un pont de votre choix." ] ).
 
-/* --------------------------------------------------------------------- */
-/*                                                                       */
-/*          CONVERSION D'UNE QUESTION DE L'UTILISATEUR EN                */
-/*                        LISTE DE MOTS                                  */
-/*                                                                       */
-/* --------------------------------------------------------------------- */
 
 % lire_question(L_Mots)
 
@@ -224,10 +213,8 @@ lire_question(LMots) :- read_atomics(LMots).
 % Pour bot en ligne
 
 
-/*****************************************************************************/
 % my_char_type(+Char,?Type)
-%    Char is an ASCII code.
-%    Type is whitespace, punctuation, numeric, alphabetic, or special.
+
 
 my_char_type(46,period) :- !.
 my_char_type(X,alphanumeric) :- X >= 65, X =< 90, !.
@@ -241,10 +228,7 @@ my_char_type(X,punctuation) :- X >= 123, X =< 126, !.
 my_char_type(_,special).
 
 
-/*****************************************************************************/
 % lower_case(+C,?L)
-%   If ASCII code C is an upper-case letter, then L is the
-%   corresponding lower-case letter. Otherwise L=C.
 
 lower_case(X,Y) :-
     X >= 65,
@@ -254,10 +238,8 @@ lower_case(X,Y) :-
 lower_case(X,X).
 
 
-/*****************************************************************************/
 % read_lc_string(-String)
-%  Reads a line of input into String as a list of ASCII codes,
-%  with all capital letters changed to lower case.
+
 
 read_lc_string(String) :-
     get0(FirstChar),
@@ -271,19 +253,15 @@ read_lc_string_aux(-1,[]) :- !.  % end of file
 read_lc_string_aux(LChar,[LChar|Rest]) :- read_lc_string(Rest).
 
 
-/*****************************************************************************/
 % extract_word(+String,-Rest,-Word) (final version)
-%  Extracts the first Word from String; Rest is rest of String.
-%  A word is a series of contiguous letters, or a series
-%  of contiguous digits, or a single special character.
-%  Assumes String does not begin with whitespace.
+
 
 extract_word([C|Chars],Rest,[C|RestOfWord]) :-
     my_char_type(C,Type),
     extract_word_aux(Type,Chars,Rest,RestOfWord).
 
     extract_word_aux(special,Rest,Rest,[]) :- !.
-% if Char is special, don't read more chars.
+
 
 extract_word_aux(Type,[C|Chars],Rest,[C|RestOfWord]) :-
     my_char_type(C,Type), !,
@@ -292,22 +270,17 @@ extract_word_aux(Type,Chars,Rest,RestOfWord).
 extract_word_aux(_,Rest,Rest,[]).   % if previous clause did not succeed.
 
 
-/*****************************************************************************/
-% remove_initial_blanks(+X,?Y)
-%   Removes whitespace characters from the
-%   beginning of string X, giving string Y.
+
 
 remove_initial_blanks([C|Chars],Result) :-
     my_char_type(C,whitespace), !,
 remove_initial_blanks(Chars,Result).
 
-remove_initial_blanks(X,X).   % if previous clause did not succeed.
+remove_initial_blanks(X,X).   
 
 
-/*****************************************************************************/
 % digit_value(?D,?V)
-%  Where D is the ASCII code of a digit,
-%  V is the corresponding number.
+
 
 digit_value(48,0).
 digit_value(49,1).
@@ -321,11 +294,8 @@ digit_value(56,8).
 digit_value(57,9).
 
 
-/*****************************************************************************/
+
 % string_to_number(+S,-N)
-%  Converts string S to the number that it
-%  represents, e.g., "234" to 234.
-%  Fails if S does not represent a nonnegative integer.
 
 string_to_number(S,N) :-
     string_to_number_aux(S,0,N).
@@ -338,22 +308,18 @@ string_to_number_aux(Digits,NewValueSoFar,Result).
 string_to_number_aux([],Result,Result).
 
 
-/*****************************************************************************/
 % string_to_atomic(+String,-Atomic)
-%  Converts String into the atom or number of
-%  which it is the written representation.
+
 
 string_to_atomic([C|Chars],Number) :-
     string_to_number([C|Chars],Number), !.
 
 string_to_atomic(String,Atom) :- atom_codes(Atom,String).
-% assuming previous clause failed.
 
 
-/*****************************************************************************/
-% extract_atomics(+String,-ListOfAtomics) (second version)
-%  Breaks String up into ListOfAtomics
-%  e.g., " abc def  123 " into [abc,def,123].
+
+
+% extract_atomics(+String,-ListOfAtomics) 2nd version
 
 extract_atomics(String,ListOfAtomics) :-
     remove_initial_blanks(String,NewString),
@@ -367,9 +333,9 @@ extract_atomics(Rest,Atomics).
 extract_atomics_aux([],[]).
 
 
-/*****************************************************************************/
+
 % clean_string(+String,-Cleanstring)
-%  removes all punctuation characters from String and return Cleanstring
+
 
 clean_string([C|Chars],L) :-
     my_char_type(C,punctuation),
@@ -381,10 +347,9 @@ clean_string([C|[]],[]) :-
 clean_string([C|[]],[C]).
 
 
-/*****************************************************************************/
+
 % read_atomics(-ListOfAtomics)
-%  Reads a line of input, removes all punctuation characters, and converts
-%  it into a list of atomic terms, e.g., [this,is,an,example].
+
 
 read_atomics(ListOfAtomics) :-
     read_lc_string(String),
@@ -393,11 +358,6 @@ read_atomics(ListOfAtomics) :-
 
 
 
-/* --------------------------------------------------------------------- */
-/*                                                                       */
-/*        PRODUIRE_REPONSE : ecrit la liste de strings                   */
-/*                                                                       */
-/* --------------------------------------------------------------------- */
 
 transformer_reponse_en_string(Li,Lo) :- flatten_strings_in_sentences(Li,Lo).
 
@@ -415,14 +375,6 @@ string_as_list(W,L) :- string_to_list(W,L).
 % string_as_list(W,W).
 
 
-/*    /!\ ci-après différent du code javascript
-*/
-
-/* --------------------------------------------------------------------- */
-/*                                                                       */
-/*        ECRIRE_REPONSE : ecrit une suite de lignes de texte            */
-/*                                                                       */
-/* --------------------------------------------------------------------- */
 
 
 ecrire_reponse(L) :-
@@ -432,7 +384,7 @@ ecrire_reponse(L) :-
 % ecrire_ligne(Li,Mi,Ei,Mf)
 % input : Li, liste de mots a ecrire
 %         Mi, indique si le premier caractere du premier mot 
-%            doit etre mis en majuscule (1 si oui, 0 si non)
+%         doit etre mis en majuscule (1 si oui, 0 si non)
 %         Ei, indique le nombre d'espaces avant ce premier mot 
 % output : Mf, booleen tel que decrit ci-dessus a appliquer 
 %          a la ligne suivante, si elle existe
@@ -472,20 +424,9 @@ espace(N) :- N>0, Nn is N-1, write(' '), espace(Nn).
 
 
 
-/* --------------------------------------------------------------------- */
-/*                                                                       */
-/*                            TEST DE FIN                                */
-/*                                                                       */
-/* --------------------------------------------------------------------- */
-
 fin(L) :- member(fin,L).
 
 
-/* --------------------------------------------------------------------- */
-/*                                                                       */
-/*                         BOUCLE PRINCIPALE                             */
-/*                                                                       */
-/* --------------------------------------------------------------------- */
 
 pontuXL :- 
 

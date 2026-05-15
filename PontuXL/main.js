@@ -1,8 +1,7 @@
-// main.js — Gestion du chat PBot (texte + vocal)
+// gestion du chat PBot (texte + vocal)
 
-// ================================================================
-// UTILITAIRES
-// ================================================================
+
+// utilitaires
 
 function toArray(str) {
     const array = [];
@@ -26,15 +25,12 @@ function jmjCodeToString(parr) {
     return arr;
 }
 
-// ================================================================
-// SESSION PROLOG POUR LE BOT
-// ================================================================
+
+// session prolog pourle bot
 
 const plSession = new PrologSession();
 
-// ================================================================
-// SYNTHESE VOCALE
-// ================================================================
+// synthese vocal
 
 const speech = new SpeechSynthesisUtterance();
 speech.lang = "fr-FR";
@@ -47,9 +43,7 @@ function parler(texte) {
     window.speechSynthesis.speak(speech);
 }
 
-// ================================================================
-// AFFICHAGE DANS LE CHAT
-// ================================================================
+// affichage dans le chat
 
 function afficherUtilisateur(texte) {
     const texts = document.getElementById("bot-texts");
@@ -71,9 +65,7 @@ function afficherBot(texte) {
     parler(texte);
 }
 
-// ================================================================
-// TRAITEMENT D'UNE QUESTION (texte ou vocal)
-// ================================================================
+// traitement de question
 
 function traiterQuestion(texte) {
     if (!texte || texte.trim() === "") return;
@@ -99,9 +91,8 @@ function traiterQuestion(texte) {
     }
 }
 
-// ================================================================
-// ENVOI PAR TEXTE (bouton ou Entrée)
-// ================================================================
+
+// envou
 
 function sendMessage() {
     const input = document.getElementById("bot-input");
@@ -120,9 +111,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 });
 
-// ================================================================
-// RECONNAISSANCE VOCALE
-// ================================================================
+
+// reconnaissance vocal
 
 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
@@ -150,8 +140,7 @@ function initVocal() {
             .join("");
         console.log("Vocal reconnu:", texte);
 
-        // Le bot répond si la phrase contient "bot" ou "pontu" (comme template du prof)
-        // OU on répond toujours (plus pratique pour la demo)
+        
         traiterQuestion(texte);
         arreterMic();
     });

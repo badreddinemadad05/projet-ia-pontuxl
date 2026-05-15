@@ -1,17 +1,12 @@
-/* =====================================================================
-   server.pl — Serveur WebSocket SWI-Prolog pour PontuXL
-   =====================================================================
+/* 
+ Serveur WebSocket SWI-Prolog 
+   
 
-   LANCEMENT :
+   lancement :
    & "C:\Program Files\swipl\bin\swipl.exe" server.pl
 
    Le serveur ecoute sur ws://localhost:8080/ai
-   JavaScript envoie : { "etat": "etat(...)", "profondeur": 2, "heuristique": "h1" }
-   Prolog repond   : { "ok": true, "coup": "mouvement(X,Y,Dir,[...])" }
-                  ou { "ok": false, "coup": "aucun", "erreur": "..." }
-
-   Coordonnees : 0-5 (identiques JS et Prolog)
-   ===================================================================== */
+ */
 
 :- use_module(library(http/thread_httpd)).
 :- use_module(library(http/http_dispatch)).
@@ -23,7 +18,7 @@
 :- consult('ai_bot.pl').
 
 
-% ===== DEMARRAGE =====
+%demarrage
 
 :- initialization(start_server, main).
 
@@ -35,7 +30,7 @@ start_server :-
     thread_get_message(_).
 
 
-% ===== ROUTE WEBSOCKET =====
+
 
 :- http_handler(root(ai), websocket_handler, []).
 
@@ -43,7 +38,7 @@ websocket_handler(Request) :-
     http_upgrade_to_websocket(handle_ws, [], Request).
 
 
-% ===== BOUCLE DE GESTION =====
+
 
 handle_ws(WebSocket) :-
     ws_receive(WebSocket, Message, [format(json)]),
@@ -57,7 +52,7 @@ handle_ws(WebSocket) :-
     ).
 
 
-% ===== TRAITEMENT D'UN MESSAGE =====
+
 
 traiter_message(Data, Reponse) :-
     (   catch(traiter_message_safe(Data, Reponse), Err, (

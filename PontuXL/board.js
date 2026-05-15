@@ -17,14 +17,13 @@ const BRIDGE_WIDTH = 4;
 const COLOR_MAP = {green: "#27ae60", blue: "#2980b9", yellow: "#f1c40f", red: "#e74c3c"};
 const COLOR_NAMES = {green: "Vert", blue: "Bleu", yellow: "Jaune", red: "Rouge"};
 
-// Correspondance JS (0-5) <-> Prolog (0-5) — meme coordonnees !
+
 const JS_TO_PROLOG_COLOR = {green: "vert", blue: "bleu", yellow: "jaune", red: "rouge"};
 const JS_TO_PROLOG_PHASE = {placement: "placement", movement: "mouvement"};
 
 
-// ============================================================
-// WEBSOCKET VERS SWI-PROLOG
-// ============================================================
+// websocket vers swiprolog
+
 
 let ws = null;
 let wsConnected = false;
@@ -68,10 +67,9 @@ function connectWebSocket() {
 connectWebSocket();
 
 
-// ============================================================
-// CONSTRUCTION DE L'ETAT PROLOG
-// Coordonnees identiques JS et Prolog : 0-5
-// ============================================================
+// construction de l'état prolog
+
+
 
 function buildPrologState() {
     let joueur = JS_TO_PROLOG_COLOR[currentPlayer()];
@@ -102,9 +100,9 @@ function buildPrologState() {
 }
 
 
-// ============================================================
-// ETAT INTERACTION
-// ============================================================
+
+// etatinteraction
+
 
 let selectedLutin = null;
 let bridgePickMode = false;
@@ -115,9 +113,9 @@ let crossedBridgesList = [];
 let currentCrossedIndex = 0;
 
 
-// ============================================================
-// DESSIN
-// ============================================================
+
+// dessin
+
 
 function toPixelX(x) {
     return PADDING + x * CELL_SIZE;
@@ -230,9 +228,7 @@ function drawLabels() {
 }
 
 
-// ============================================================
-// HIGHLIGHT
-// ============================================================
+
 
 function highlightAllBridges() {
     ctx.strokeStyle = "#e74c3c";
@@ -299,9 +295,8 @@ function pixelToArrow(mouseX, mouseY) {
 }
 
 
-// ============================================================
-// DETECTION
-// ============================================================
+
+// detection
 
 function pixelToCell(mouseX, mouseY) {
     let bestX = -1, bestY = -1, bestDist = Infinity;
@@ -337,9 +332,7 @@ function pixelToBridge(mouseX, mouseY) {
 }
 
 
-// ============================================================
-// ROTATION
-// ============================================================
+// rotation
 
 function canRotate(ax, ay, x1, y1, x2, y2, direction) {
     let isVertical = (x1 === x2);
@@ -447,10 +440,8 @@ function applyBridgePick(action) {
 }
 
 
-// ============================================================
-// GESTIONNAIRE DE CLIC
-// ============================================================
 
+// gestionnaire de clics
 canvas.addEventListener("click", function (e) {
     let rect = canvas.getBoundingClientRect();
     let mouseX = e.clientX - rect.left, mouseY = e.clientY - rect.top;
@@ -490,9 +481,7 @@ canvas.addEventListener("click", function (e) {
 });
 
 
-// ============================================================
-// PLACEMENT
-// ============================================================
+// placement
 
 function handlePlacement(x, y) {
     if (isOccupied(x, y)) {
@@ -539,9 +528,7 @@ function handleAIPlacement() {
 }
 
 
-// ============================================================
-// MOUVEMENT
-// ============================================================
+// mouvement
 
 function handleMovementClick(x, y) {
     let player = currentPlayer();
@@ -585,9 +572,7 @@ function cancelSelection() {
 }
 
 
-// ============================================================
-// FIN DE TOUR
-// ============================================================
+// fin de tour
 
 function finishTurn() {
     crossedBridgesList = [];
@@ -622,9 +607,6 @@ function startPlayerTurn() {
 }
 
 
-// ============================================================
-// IA — WebSocket SWI-Prolog (intelligent) ou fallback aleatoire
-// ============================================================
 
 function jouerAleatoire(player) {
     let indices = [...Array(lutins[player].length).keys()].sort(() => Math.random() - 0.5);
@@ -720,9 +702,8 @@ function handleAIMove() {
 }
 
 
-// ============================================================
+
 // UI
-// ============================================================
 
 function setMessage(msg) {
     messageBox.innerText = msg;
@@ -737,9 +718,9 @@ function updateInfoBar() {
 }
 
 
-// ============================================================
-// SESSION IA — tau-Prolog (conseil uniquement)
-// ============================================================
+
+// tau-Prolog (conseil uniquement)
+
 
 let aiSession = null;
 
@@ -792,14 +773,14 @@ function formatCoupEnFrancais(coup) {
             dx = -1;
         }
 
-        // Calculer la case d'arrivee en simulant la glissade
+        // Calcule la case d'arrivee en simulant la glissade
         let endX = startX, endY = startY;
         for (let p of pts) {
             endX += dx;
             endY += dy;
         }
 
-        // Verifier que le lutin a vraiment bouge
+        // Verifie que le lutin a vraiment bouge
         if (endX === startX && endY === startY) {
             return "Le conseil calcule ne produit pas de mouvement. Essayez de jouer d'abord quelques coups.";
         }
@@ -862,9 +843,7 @@ function afficherMessageBot(texte) {
 }
 
 
-// ============================================================
-// LANCEMENT
-// ============================================================
+// launch
 
 initGame();
 drawBoard();

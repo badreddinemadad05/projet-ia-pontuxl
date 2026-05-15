@@ -1,19 +1,14 @@
 const AI_BOT = String.raw`
-/* =====================================================================
-   ai_bot.pl  —  Intelligence Artificielle pour PontuXL
-   =====================================================================
+/* 
+   Intelligence Artificielle pour PontuXL
 
    REPRÉSENTATION D'UN ÉTAT : etat/5
-   ----------------------------------
-   Un état du jeu est représenté par le terme :
-
-       etat(JoueurCourant, Lutins, Ponts, Elimines, Phase)
+   Un état du jeu est représenté par le terme : etat(JoueurCourant, Lutins, Ponts, Elimines, Phase)
 
    Détail de chaque champ :
-
    1. JoueurCourant : atom
          Le joueur qui doit jouer ce tour.
-         Valeurs possibles : vert, bleu, jaune, rouge
+         il peut etre : vert, bleu, jaune, rouge
          Ordre du jeu : vert -> bleu -> jaune -> rouge -> vert -> ...
 
    2. Lutins : liste de termes lutin(Couleur, X, Y)
@@ -46,12 +41,12 @@ const AI_BOT = String.raw`
                         (chacun place 1 lutin par tour, 6 tours chacun)
          mouvement  => tous les lutins sont placés, on joue normalement
 
-   ===================================================================== */
+  */
 
 
 :- use_module(library(lists)).
 
-/* Prédicats utilitaires */
+/* utilitaires */
 
 somme_liste([], 0).
 somme_liste([H|T], S) :-
@@ -67,10 +62,6 @@ retirer_element(_, [], []).
 retirer_element(E, [E|T], Out) :- !, retirer_element(E, T, Out).
 retirer_element(E, [H|T], [H|Out]) :- retirer_element(E, T, Out).
 
-
-/* =====================================================================
-   UTILITAIRES DE BASE
-   ===================================================================== */
 
 partie_finie(etat(_,_,_,Elimines,_)) :-
     tous_les_joueurs(Tous),
@@ -99,10 +90,10 @@ next_in_cycle_aux(X, [X], [Y | _], Y) :- !.
 next_in_cycle_aux(X, [_ | Rest], ListeComplete, Y) :-
     next_in_cycle_aux(X, Rest, ListeComplete, Y).
 
-/* ---------------------------------------------------------------------
+/* 
    case_valide(+X, +Y)
    Vrai si (X,Y) est une case du plateau 6x6.
-   --------------------------------------------------------------------- */
+ */
 
 case_valide(X, Y) :-
     integer(X), integer(Y),
@@ -154,9 +145,8 @@ joueur_actif(Elimines, J) :- \+ member(J, Elimines).
 joueur_est_elimine_check(Lutins, Ponts, J) :- joueur_est_elimine(J, Lutins, Ponts).
 
 
-/* =====================================================================
-   INITIALISATION
-   ===================================================================== */
+/* 
+   initialisation: */
 
 ponts_initiaux(Ponts) :-
     findall(pont(X,Y,X2,Y), (
@@ -171,9 +161,8 @@ etat_initial(etat(vert, [], Ponts, [], placement)) :-
     ponts_initiaux(Ponts).
 
 
-/* =====================================================================
-   GÉNÉRATION DES COUPS POSSIBLES
-   ===================================================================== */
+/* 
+   génération des coups possibles*/
 
 actions_possibles(etat(_, Lutins, _, _, placement), _, placer(X, Y)) :-
     between(0, 5, X),
@@ -187,21 +176,19 @@ actions_possibles(etat(_, Lutins, Ponts, _, mouvement), Joueur,
     direction_delta(Dir, Dx, Dy),
     glisser(X, Y, Dx, Dy, Lutins, Ponts, _, _, PontsTraverses),
     PontsTraverses \= [].
-/* ---------------------------------------------------------------------
-   CAS 3 : joueur bloque mais pas elimine
-   Si le joueur ne peut deplacer aucun lutin, il peut retirer un pont
-   de son choix.
-   --------------------------------------------------------------------- */
+/* 
+   CAS : joueur bloque mais pas elimine
+  */
 
 actions_possibles(etat(_, Lutins, Ponts, Elimines, mouvement), Joueur,
                   retirer_pont_libre(pont(X1, Y1, X2, Y2))) :-
     \+ member(Joueur, Elimines),
     \+ mouvement_possible(Joueur, Lutins, Ponts),
     member(pont(X1, Y1, X2, Y2), Ponts).
-/* ---------------------------------------------------------------------
+/* 
    mouvement_possible(+Joueur, +Lutins, +Ponts)
    Vrai si au moins un lutin du joueur peut glisser dans une direction.
-   --------------------------------------------------------------------- */
+  */
 
 mouvement_possible(Joueur, Lutins, Ponts) :-
     member(lutin(Joueur, X, Y), Lutins),
@@ -228,22 +215,16 @@ glisser(X, Y, Dx, Dy, Lutins, Ponts, EndX, EndY, PontsTraverses) :-
 
 glisser(X, Y, _, _, _, _, X, Y, []).
 
-/* =====================================================================
-   POINT D'ENTRÉE SIMPLE / SECOURS POUR JAVASCRIPT
-   =====================================================================
+/* 
 
-   choisir_coup(+Etat, -Coup)
-   --------------------------
-   Cette version simple retourne un premier coup possible.
+ Cette version simple retourne un premier coup possible.
    Elle est conservée comme solution de secours et pour compatibilité
    avec les anciennes versions du projet.
 
    La version principale de l'IA utilisée par le serveur Prolog est :
-       choisir_coup_shallow(+Etat, +Profondeur, +Heuristique, -Action)
-
+    choisir_coup_shallow(+Etat, +Profondeur, +Heuristique, -Action)
    Cette version principale utilise MaxN et un élagage shallow adapté
-   au cas multi-joueurs.
-   ===================================================================== */
+   au cas multi-joueurs. */
 
 choisir_coup(Etat, Coup) :-
     Etat = etat(Joueur, Lutins, _Ponts, _Elimines, mouvement),
@@ -257,9 +238,9 @@ premier_coup_valide(Joueur, Lutins, coup(Index, Direction, remove)) :-
     !.
 
 
-/* =====================================================================
-   FONCTION DE TRANSITION
-   ===================================================================== */
+/* 
+   fonction de transitions
+*/
 
 appliquer(etat(Joueur, Lutins, Ponts, Elimines, placement),
           placer(X, Y),
@@ -295,10 +276,10 @@ supprimer_ponts([pont(X1,Y1,X2,Y2) | Reste], PontsIn, PontsOut) :-
     retirer_pont(X1, Y1, X2, Y2, PontsIn, PontsTmp),
     supprimer_ponts(Reste, PontsTmp, PontsOut).
 
-/* =====================================================================
-   HEURISTIQUE 1 : mobilité totale
+/*
+   h1 (mobilité totale
    Score = somme des ponts autour de chaque lutin du joueur.
-   ===================================================================== */
+  */
 
 eval_h1(etat(_, Lutins, Ponts, Elimines, _), Joueur, Score) :-
     (   member(Joueur, Elimines)
@@ -318,11 +299,11 @@ evaluer_vecteur_h1(Etat, [Sv, Sb, Sj, Sr]) :-
     eval_h1(Etat, rouge, Sr).
 
 
-/* =====================================================================
-   HEURISTIQUE 2 : maillon faible
+/* 
+   H2 maillon faible
    Score = minimum des ponts autour de chaque lutin du joueur.
    H1 = richesse globale, H2 = robustesse du lutin le plus vulnérable.
-   ===================================================================== */
+ */
 
 eval_h2(etat(_, Lutins, Ponts, Elimines, _), Joueur, Score) :-
     (   member(Joueur, Elimines)
@@ -342,10 +323,10 @@ evaluer_vecteur_h2(Etat, [Sv, Sb, Sj, Sr]) :-
     eval_h2(Etat, rouge, Sr).
 
 
-/* =====================================================================
-   ALGORITHME MAXN (Minimax généralisé à 4 joueurs)
+/* 
+   Algo maxn
    Chaque joueur maximise SA composante dans le vecteur [Sv,Sb,Sj,Sr].
-   ===================================================================== */
+    */
 
 maxn(Etat, 0, h1, Vecteur, aucune) :- !, evaluer_vecteur_h1(Etat, Vecteur).
 maxn(Etat, 0, h2, Vecteur, aucune) :- !, evaluer_vecteur_h2(Etat, Vecteur).
@@ -390,13 +371,11 @@ choisir_coup_maxn(Etat, Profondeur, Heuristique, Action) :-
     Action \= aucune.
 
 
-/* ---------------------------------------------------------------------
-   Point d'entrée MaxN
-   -------------------
-   Cette partie calcule un coup avec MaxN.
+/* 
+   Cette partie calcule un coup avec maxn.
    Elle est utilisée comme base de l'IA multi-joueurs avant l'ajout
    de l'élagage shallow.
-   --------------------------------------------------------------------- */
+*/
 
 choisir_coup_intelligent(Etat, Coup) :-
     choisir_coup_maxn(Etat, 2, h1, Coup), !.
@@ -406,16 +385,10 @@ choisir_coup_intelligent(Etat, Coup) :-
     actions_possibles(Etat, Joueur, Coup), !.
 
 
-/* =====================================================================
-   SHALLOW PRUNING (Korf 1991, section 3.2)
-   
-   Pourquoi pas deep pruning : impossible à 4 joueurs (Korf, section 3.4).
-   Un nœud pruné peut quand même influencer la racine via d'autres joueurs.
-   
-   Shallow pruning valide sous deux conditions (Theorem 1) :
-   1. Borne inférieure >= 0 sur chaque composante (nb ponts >= 0) ✅
-   2. Borne supérieure sur la SOMME : 4 × 6 × 4 = 96 ✅
-   ===================================================================== */
+/* 
+   shallow pruning (Korf) 
+   pas deep pruning car impossible à 4 joueurs
+ */
 
 sum_max(96).
 

@@ -254,12 +254,7 @@ function moveLutin(lutinIndex, direction) {
 //  gestion des ponts après déplacement
 
 // pour chaque pont traversé, le joueur choisit : retirer ou tourner
-// actions possibles :
-// "remove"
-// "rotate1_left"  : axe case 1, pont vertical → gauche / pont horizontal → bas
-// "rotate1_right" : axe case 1, pont vertical → droite / pont horizontal → haut
-// "rotate2_left"  : axe case 2, pont vertical → gauche / pont horizontal → bas
-// "rotate2_right" : axe case 2, pont vertical → droite / pont horizontal → haut
+
 function handleBridgeAction(x1, y1, x2, y2, action) {
     if (action === "remove") {
         removeBridge(x1, y1, x2, y2);
@@ -285,8 +280,8 @@ function handleBridgeAction(x1, y1, x2, y2, action) {
     let isVertical = (x1 === x2); // même x = pont vertical
     let goRight = action.endsWith("right");
 
-    // Pont vertical (↑) : tourne vers gauche (-1,0) ou droite (+1,0)
-    // Pont horizontal (→) : tourne vers haut (0,+1) ou bas (0,-1)
+    // Pont vertical  : tourne vers gauche (-1,0) ou droite (+1,0)
+    // Pont horizontal : tourne vers haut (0,+1) ou bas (0,-1)
     let newDx, newDy;
     if (isVertical) {
         newDx = goRight ? 1 : -1;
