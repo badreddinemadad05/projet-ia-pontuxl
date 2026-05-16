@@ -98,6 +98,9 @@ mclef(bloqu,5).
 
 % QUESTION 1 : Qui commence le jeu ?
 % Reponse exacte 
+regle_rep(commence,10,
+  [ [ commence ] ],
+  [ "Par convention, c'est au joueur en charge des lutins verts de commencer la partie." ] ).
 %
 % QUESTION 2 : Combien de lutins compte chaque equipe ?
 % Reponse exacte : 6
