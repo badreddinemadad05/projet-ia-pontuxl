@@ -97,7 +97,7 @@ mclef(phase,5).
 mclef(glisse,5).
 mclef(plateau,5).
 mclef(joueur,5).
-mclef(bloqu,5).
+
 
 
 % QUESTION 1 : Qui commence le jeu ?
@@ -172,17 +172,11 @@ regle_rep(conseillezvous,20,
 
 % dialogue imaginé
 
-regle_rep(elimine,5,
-  [ [ elimin ] ],
-  [ "Un joueur est elimine lorsque tous ses lutins n'ont plus aucun pont autour d'eux." ] ).
 
 regle_rep(gagne,5,
   [ [ gagne ] ],
   [ "Le dernier joueur non elimine gagne la partie." ] ).
 
-regle_rep(ordre,5,
-  [ [ ordre ] ],
-  [ "L'ordre de jeu est : verts, puis bleus, puis jaunes, puis rouges." ] ).
 
 regle_rep(phase,5,
   [ [ phase ] ],
@@ -196,13 +190,8 @@ regle_rep(plateau,5,
   [ [ plateau ] ],
   [ "Le plateau est de taille 6 sur 6. Le coin inferieur gauche est l'origine (0,0)." ] ).
 
-regle_rep(joueur,5,
-  [ [ joueur ] ],
-  [ "Le jeu se joue a 4 joueurs : verts et jaunes sont humains, bleus et rouges sont des robots." ] ).
 
-regle_rep(bloqu,5,
-  [ [ bloqu ] ],
-  [ "Si aucun de vos lutins ne peut bouger, vous devez retirer un pont de votre choix." ] ).
+
 
 
 % lire_question(L_Mots)

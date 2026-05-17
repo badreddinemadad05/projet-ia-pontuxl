@@ -86,14 +86,14 @@ mclef(deplacer,5).
 
 mclef(pont,5).
 % Mots-cles pour dialogues supplementaires
-mclef(elimine,5).
+
 mclef(gagne,5).
-mclef(ordre,5).
+
 mclef(phase,5).
 mclef(glisse,5).
 mclef(plateau,5).
-mclef(joueur,5).
-mclef(bloqu,5).
+
+
  
 
 % QUESTION 1 : Qui commence le jeu ?
@@ -138,9 +138,7 @@ regle_rep(occup,5,
   [ "Non." ] ).
   
 
-regle_rep(occup,5,
-  [ [ occup ] ],
-  [ "Non." ] ).
+
 
 
 % QUESTION 4 : Quel pont puis-je retirer apres avoir deplace un lutin ?
@@ -169,20 +167,14 @@ regle_rep(conseillezvous,20,
   % dialogue supplémentaire (imagines par les etudiants)
 
 
-% Comment est-on elimine ?
-regle_rep(elimine,5,
-  [ [ elimin ] ],
-  [ "Un joueur est elimine lorsque tous ses lutins n'ont plus aucun pont autour d'eux." ] ).
+
 
 % Qui gagne ?
 regle_rep(gagne,5,
   [ [ gagne ] ],
   [ "Le dernier joueur non elimine gagne la partie." ] ).
 
-% Ordre des joueurs
-regle_rep(ordre,5,
-  [ [ ordre ] ],
-  [ "L'ordre de jeu est : verts, puis bleus, puis jaunes, puis rouges." ] ).
+
 
 % Phases du jeu
 regle_rep(phase,5,
@@ -199,15 +191,8 @@ regle_rep(plateau,5,
   [ [ plateau ] ],
   [ "Le plateau est de taille 6 sur 6. Le coin inferieur gauche est l'origine (0,0)." ] ).
 
-% Combien de joueurs ?
-regle_rep(joueur,5,
-  [ [ joueur ] ],
-  [ "Le jeu se joue a 4 joueurs : verts et jaunes sont humains, bleus et rouges sont des robots." ] ).
 
-% Que faire si on est bloque ?
-regle_rep(bloqu,5,
-  [ [ bloqu ] ],
-  [ "Si aucun de vos lutins ne peut bouger, vous devez retirer un pont de votre choix." ] ).
+
 
 
 
